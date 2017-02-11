@@ -284,6 +284,7 @@ PopupMenu MainHostWindow::getMenuForIndex (int topLevelMenuIndex, const String& 
 
         menu.addSeparator();
         menu.addCommandItem (&getCommandManager(), CommandIDs::aboutBox);
+        menu.addCommandItem (&getCommandManager(), CommandIDs::help);
     }
     else if (topLevelMenuIndex == 3)
     {
@@ -385,7 +386,8 @@ void MainHostWindow::getAllCommands (Array <CommandID>& commands)
                               CommandIDs::showAudioSettings,
                               CommandIDs::toggleDoublePrecision,
                               CommandIDs::aboutBox,
-                              CommandIDs::allWindowsForward
+                              CommandIDs::allWindowsForward,
+                              CommandIDs::help
                             };
 
     commands.addArray (ids, numElementsInArray (ids));
@@ -440,6 +442,10 @@ void MainHostWindow::getCommandInfo (const CommandID commandID, ApplicationComma
     case CommandIDs::allWindowsForward:
         result.setInfo ("All Windows Forward", "Bring all plug-in windows forward", category, 0);
         result.addDefaultKeypress ('w', ModifierKeys::commandModifier);
+        break;
+    
+    case CommandIDs::help:
+        result.setInfo ("Help", String(), category, 0);
         break;
 
     default:
@@ -503,7 +509,7 @@ bool MainHostWindow::perform (const InvocationInfo& info)
         break;
 
     case CommandIDs::aboutBox:
-        // TODO
+        showAboutBox();
         break;
 
     case CommandIDs::allWindowsForward:
@@ -515,12 +521,100 @@ bool MainHostWindow::perform (const InvocationInfo& info)
 
         break;
     }
-
+            
+    case CommandIDs::help:
+        showHelp();
+        break;
+            
     default:
         return false;
     }
 
     return true;
+}
+
+//==============================================================================
+class AboutBoxComponent   : public Component
+{
+public:
+    AboutBoxComponent()
+    {
+        addAndMakeVisible(label0);
+        Font iconFont;
+        iconFont.setTypefaceName("font-middle");
+        iconFont.setHeight(40.0f);
+        label0.setFont(iconFont);
+        label0.setColour(Label::textColourId, altLookAndFeel.getAccentColour().withAlpha(0.2f));
+        label0.setText("k", dontSendNotification);
+        label0.setJustificationType(Justification::centred);
+        addAndMakeVisible(filler);
+        addAndMakeVisible(label1);
+        label1.setText("Middle 1.0.0", dontSendNotification);
+        label1.setJustificationType(Justification::centred);
+        addAndMakeVisible(label2);
+        label2.setText("Feb 6 2017", dontSendNotification);
+        label2.setJustificationType(Justification::centred);
+        addAndMakeVisible(label3);
+        label3.setText("www.songwish.ca", dontSendNotification);
+        label3.setJustificationType(Justification::centred);
+        setSize(300, 300);
+        addAndMakeVisible(filler);
+        addAndMakeVisible(label4);
+        label4.setFont(iconFont);
+        label4.setColour(Label::textColourId, altLookAndFeel.getAccentColour().withAlpha(0.2f));
+        label4.setJustificationType(Justification::centred);
+        label4.setText("m", dontSendNotification);
+    }
+    
+    void resized() override
+    {
+        Rectangle<int> r = getLocalBounds();
+        int percentage = getHeight() / 7;
+        
+        label0.setBounds(r.removeFromTop(percentage));
+        filler.setBounds(r.removeFromTop(percentage));
+        label1.setBounds(r.removeFromTop(percentage));
+        label2.setBounds(r.removeFromTop(percentage));
+        label3.setBounds(r.removeFromTop(percentage));
+        filler.setBounds(r.removeFromTop(percentage));
+        label4.setBounds(r.removeFromTop(percentage));
+        
+    }
+    
+private:
+    Label filler;
+    Label label0;
+    Label label1;
+    Label label2;
+    Label label3;
+    Label label4;
+    AltLookAndFeel altLookAndFeel;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutBoxComponent)
+};
+
+void MainHostWindow::showAboutBox()
+{
+    AboutBoxComponent aboutBox;
+    
+    
+    DialogWindow::LaunchOptions o;
+    o.content.setNonOwned (&aboutBox);
+    o.dialogTitle                   = "About";
+    o.componentToCentreAround       = this;
+    o.dialogBackgroundColour        = Colours::white;
+    o.escapeKeyTriggersCloseButton  = true;
+    o.useNativeTitleBar             = false;
+    o.resizable                     = false;
+    
+    o.runModal();
+    
+}
+
+void MainHostWindow::showHelp()
+{
+    File file("/Users/andrewliston/Middle_User_Manual.pdf");
+    file.startAsProcess();
 }
 
 void MainHostWindow::showAudioSettings()

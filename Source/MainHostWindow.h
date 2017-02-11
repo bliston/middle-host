@@ -42,6 +42,7 @@ namespace CommandIDs
     static const int aboutBox               = 0x30300;
     static const int allWindowsForward      = 0x30400;
     static const int toggleDoublePrecision  = 0x30500;
+    static const int help                   = 0x30600;
 }
 
 ApplicationCommandManager& getCommandManager();
@@ -110,6 +111,8 @@ private:
     ScopedPointer<PluginListWindow> pluginListWindow;
     AltLookAndFeel altLookAndFeel;
     void showAudioSettings();
+    void showAboutBox();
+    void showHelp();
 
 	static void runtimPermissionsCallback(bool wasGranted);
 

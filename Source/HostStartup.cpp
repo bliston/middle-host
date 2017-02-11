@@ -53,7 +53,7 @@ public:
         LookAndFeel::setDefaultLookAndFeel (&altLookAndFeel);
 
         mainWindow = new MainHostWindow();
-        mainWindow->setUsingNativeTitleBar (false);
+        mainWindow->setUsingNativeTitleBar (true);
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (mainWindow);

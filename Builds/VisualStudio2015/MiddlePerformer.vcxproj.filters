@@ -2130,12 +2130,6 @@
     <ClInclude Include="..\..\Source\MainHostWindow.h">
       <Filter>MiddlePerformer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\MenuButton.h">
-      <Filter>MiddlePerformer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MenuLookAndFeel.h">
-      <Filter>MiddlePerformer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\AudioLiveScrollingDisplay.h">
       <Filter>MiddlePerformer</Filter>
     </ClInclude>

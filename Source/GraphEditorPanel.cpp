@@ -28,7 +28,7 @@ available: visit www.juce.com for more information.
 #include "MainHostWindow.h"
 #include "FilterIOConfiguration.h"
 #include "AudioRecordingDemo.cpp"
-#include "MenuButton.h"
+#include "AltLookAndFeel.h"
 
 //==============================================================================
 class PluginWindow;
@@ -272,7 +272,7 @@ public:
 
 		p.addRectangle(w * 0.4f, isInput ? (0.5f * h) : 0.0f, w * 0.2f, h * 0.5f);
 
-		Colour colour = (index == FilterGraph::midiChannelNumber ? Colours::red : Colours::green);
+		Colour colour = (index == FilterGraph::midiChannelNumber ? altLookAndFeel.getAccentColour() : Colour (0xff575757));
 
 		g.setColour(colour.withRotatedHue(static_cast<float> (busIdx) / 5.0f));
 		g.fillPath(p);
@@ -304,6 +304,7 @@ public:
 
 private:
 	FilterGraph& graph;
+    AltLookAndFeel altLookAndFeel;
 
 	GraphEditorPanel* getGraphPanel() const noexcept
 	{
@@ -328,8 +329,8 @@ public:
 		numIns(0),
 		numOuts(0)
 	{
-		shadow.setShadowProperties(DropShadow(Colours::black.withAlpha(0.5f), 3, Point<int>(0, 1)));
-		setComponentEffect(&shadow);
+		//shadow.setShadowProperties(DropShadow(Colours::black.withAlpha(0.5f), 3, Point<int>(0, 1)));
+		//setComponentEffect(&shadow);
 
 		setSize(150, 60);
 	}
@@ -446,7 +447,7 @@ public:
 
 	void paint(Graphics& g) override
 	{
-		g.setColour(Colours::lightgrey);
+		g.setColour(Colours::whitesmoke);
 
 		const int x = 4;
 		const int y = pinSize;
@@ -455,12 +456,12 @@ public:
 
 		g.fillRect(x, y, w, h);
 
-		g.setColour(Colours::black);
+		g.setColour(Colours::grey);
 		g.setFont(font);
 		g.drawFittedText(getName(), getLocalBounds().reduced(4, 2), Justification::centred, 2);
 
-		g.setColour(Colours::grey);
-		g.drawRect(x, y, w, h);
+		//g.setColour(Colours::grey);
+		//g.drawRect(x, y, w, h);
 	}
 
 	void resized() override
@@ -698,11 +699,11 @@ public:
 		if (sourceFilterChannel == FilterGraph::midiChannelNumber
 			|| destFilterChannel == FilterGraph::midiChannelNumber)
 		{
-			g.setColour(Colours::red);
+			g.setColour(altLookAndFeel.getAccentColour().withAlpha(0.4f));
 		}
 		else
 		{
-			g.setColour(Colours::green);
+			g.setColour(Colour (0xff575757).withAlpha(0.4f));
 		}
 
 		g.fillPath(linePath);
@@ -809,6 +810,7 @@ private:
 	float lastInputX, lastInputY, lastOutputX, lastOutputY;
 	Path linePath, hitPath;
 	bool dragging;
+    AltLookAndFeel altLookAndFeel;
 
 	GraphEditorPanel* getGraphPanel() const noexcept
 	{
@@ -1131,17 +1133,14 @@ public:
 
 		addAndMakeVisible(menuButton1);
 		menuButton1.setButtonText("f:Audio Settings");
-		menuButton1.setCornerSize(0.0f);
 		menuButton1.addListener(this);
 
 		addAndMakeVisible(menuButton2);
 		menuButton2.setButtonText("g:Open Preset");
-		menuButton2.setCornerSize(0.0f);
 		menuButton2.addListener(this);
 
 		addAndMakeVisible(menuButton3);
 		menuButton3.setButtonText("k:Open Middle");
-		menuButton3.setCornerSize(0.0f);
 		menuButton3.addListener(this);
 
 		addAndMakeVisible(audioRecordingDemo);
@@ -1206,10 +1205,10 @@ public:
 
 
 private:
-	MenuButton menuButton1;
-	MenuButton menuButton2;
-	MenuButton menuButton3;
-	MenuButton menuButton4;
+	TextButton menuButton1;
+	TextButton menuButton2;
+	TextButton menuButton3;
+	TextButton menuButton4;
 	AudioRecordingDemo audioRecordingDemo;
 	ApplicationCommandManager commandManager;
 	ScopedPointer<MainHostWindow> mainWindow;
@@ -1225,11 +1224,11 @@ GraphDocumentComponent::GraphDocumentComponent(AudioPluginFormatManager& formatM
 	: graph(new FilterGraph(formatManager)), deviceManager(deviceManager_),
 	graphPlayer(getAppProperties().getUserSettings()->getBoolValue("doublePrecisionProcessing", false))
 {
+    AltLookAndFeel altLookAndFeel;
 	addAndMakeVisible(tabs = new TabbedComponent(TabbedButtonBar::TabsAtTop));
-	tabs->addTab("Dashboard", Colour(juce::Colours::white), new Dashboard(*graph), true);
-	tabs->addTab("Graph", Colour(juce::Colours::white), graphPanel = new GraphEditorPanel(*graph), true);
-	//tabs->addTab("Recorder", Colour(juce::Colours::white), new AudioRecordingDemo(), true);
-	//addAndMakeVisible(graphPanel = new GraphEditorPanel(*graph));
+    tabs->setTabBarDepth (60);
+	tabs->addTab("t:Menu", altLookAndFeel.getAccentColour(), new Dashboard(*graph), true);
+	tabs->addTab("u:Edit Preset", altLookAndFeel.getAccentColour(), graphPanel = new GraphEditorPanel(*graph), true);
 
 	deviceManager->addChangeListener(graphPanel);
 

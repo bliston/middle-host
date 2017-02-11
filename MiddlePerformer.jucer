@@ -7,7 +7,8 @@
               companyEmail="info@songwish.ca">
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="" rtasFolder="~/SDKs/PT_80_SDK"
-               objCExtraSuffix="M73TRi" vst3Folder="../VST3 SDK" extraCompilerFlags="-Wall -Wshadow -Wno-missing-field-initializers -Wshadow -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion">
+               objCExtraSuffix="M73TRi" vst3Folder="/Users/andrewliston/Documents/VST3 SDK"
+               extraCompilerFlags="-Wall -Wshadow -Wno-missing-field-initializers -Wshadow -Wshorten-64-to-32 -Wstrict-aliasing -Wuninitialized -Wunused-parameter -Wconversion -Wsign-compare -Wint-conversion -Woverloaded-virtual -Wreorder -Wconstant-conversion -Wsign-conversion">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Middle Performer"
                        osxSDK="default" osxCompatibility="default" osxArchitecture="default"/>
@@ -102,9 +103,6 @@
           file="Source/MainHostWindow.cpp"/>
     <FILE id="pdaS2j" name="MainHostWindow.h" compile="0" resource="0"
           file="Source/MainHostWindow.h"/>
-    <FILE id="c4PL3S" name="MenuButton.h" compile="0" resource="0" file="Source/MenuButton.h"/>
-    <FILE id="J1IwB5" name="MenuLookAndFeel.h" compile="0" resource="0"
-          file="Source/MenuLookAndFeel.h"/>
     <FILE id="fXkogC" name="AudioLiveScrollingDisplay.h" compile="0" resource="0"
           file="Source/AudioLiveScrollingDisplay.h"/>
     <FILE id="dd9VCb" name="AudioRecordingDemo.cpp" compile="1" resource="0"

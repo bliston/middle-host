@@ -174,7 +174,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (Colours::darkgrey);
+        g.fillAll (Colours::white);
         g.setColour (Colours::lightgrey);
 
         if (thumbnail.getTotalLength() > 0.0)
@@ -218,19 +218,12 @@ public:
     {
         setOpaque (true);
         addAndMakeVisible (liveAudioScroller);
-
-        //addAndMakeVisible (explanationLabel);
-        //explanationLabel.setText ("This page demonstrates how to record a wave file from the live audio input..\n\nPressing record will start recording a file in your \"Documents\" folder.", dontSendNotification);
-        //explanationLabel.setFont (Font (15.00f, Font::plain));
-        //explanationLabel.setJustificationType (Justification::topLeft);
-        //explanationLabel.setEditable (false, false, false);
-        //explanationLabel.setColour (TextEditor::textColourId, Colours::black);
-        //explanationLabel.setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
+        liveAudioScroller.setColours(Colour (0xffffffff), altLookAndFeel.getAccentColour().withAlpha(0.2f));
         addAndMakeVisible (recordButton);
         recordButton.setButtonText ("q:Record");
         recordButton.addListener (this);
-        recordButton.setColour (TextButton::buttonColourId, Colour (0xffff5c5c));
+        recordButton.setColour (TextButton::buttonColourId, Colours::whitesmoke);
+        recordButton.setColour (TextButton::textColourOnId, Colours::darkgrey);
         addAndMakeVisible (recordingThumbnail);
         deviceManager.addAudioCallback (&liveAudioScroller);
         deviceManager.addAudioCallback (&recorder);
@@ -268,12 +261,13 @@ private:
     Label explanationLabel;
     TextButton recordButton;
 	ScopedPointer<MainHostWindow> mainWindow;
-
+    AltLookAndFeel altLookAndFeel;
+    File audioFile;
     void startRecording()
     {
-        const File file (File::getSpecialLocation (File::userDocumentsDirectory)
-                            .getNonexistentChildFile ("Juce Demo Audio Recording", ".ogg"));
-        recorder.startRecording (file);
+        audioFile = *new File(File::getSpecialLocation (File::userDocumentsDirectory)
+                            .getNonexistentChildFile ("Middle Recording", ".wav"));
+        recorder.startRecording (audioFile);
 
         recordButton.setButtonText ("n:Stop");
         recordingThumbnail.setDisplayFullThumbnail (false);
@@ -284,6 +278,7 @@ private:
         recorder.stop();
 		recordButton.setButtonText("q:Record");
         recordingThumbnail.setDisplayFullThumbnail (true);
+        audioFile.startAsProcess();
     }
 
     void buttonClicked (Button* button) override

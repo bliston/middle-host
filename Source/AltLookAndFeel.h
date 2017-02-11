@@ -1,4 +1,6 @@
 
+#ifndef __ALTLOOKANDFEEL_JUCEHEADER__
+#define __ALTLOOKANDFEEL_JUCEHEADER__
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
@@ -24,18 +26,24 @@ class AltLookAndFeel : public LookAndFeel_V3
 public:
     AltLookAndFeel()
     {
+        
+        accentColour = Colour (0xff9c27b0).withAlpha(1.0f);
         LookAndFeel::setDefaultSansSerifTypefaceName("Quicksand");
-        setColour(TextButton::textColourOnId, Colour (0xffffffff));
-        setColour(TextButton::buttonColourId, Colour (0xff4FC3F7));
+        setColour(TextButton::textColourOnId, accentColour);
+        setColour(TextButton::buttonColourId, Colours::white);
         setColour (AlertWindow::backgroundColourId, Colour (0xffffffff));
         setColour (AlertWindow::textColourId, Colour (0xff000000));
         setColour (AlertWindow::outlineColourId, Colour (0xffffffff));
-        setColour(TextEditor::focusedOutlineColourId, Colour (0xff4FC3F7));
-        setColour(TextEditor::highlightedTextColourId, Colour (0xff4FC3F7));
-        setColour(TextEditor::textColourId, Colour (0xff4FC3F7));
-        setColour(TabbedButtonBar::tabOutlineColourId, Colours::whitesmoke);
-        setColour(TabbedComponent::backgroundColourId, Colours::white);
+        setColour(TextEditor::focusedOutlineColourId, accentColour);
+        setColour(TextEditor::highlightedTextColourId, accentColour);
+        setColour(TextEditor::textColourId, accentColour);
+        setColour(TabbedButtonBar::tabOutlineColourId, accentColour);
+        setColour(TabbedButtonBar::frontTextColourId, Colours::white);
+        setColour(TabbedButtonBar::tabTextColourId, Colours::lightgrey);
+        setColour(TabbedComponent::backgroundColourId, accentColour);
         setColour(TabbedComponent::outlineColourId, Colours::white);
+        setColour(DocumentWindow::textColourId, Colours::white);
+        
 
     }
     
@@ -84,7 +92,6 @@ public:
     {
         const float mouseOver = isMouseOverButton ? 0.5f: 1.0f;
         Colour textColour;
-        //textColour = *new Colour(Colour (0xff000000));
         textColour = button.findColour(TextButton::textColourOnId).withAlpha(mouseOver);
         String name;
         name = button.getButtonText();
@@ -154,7 +161,7 @@ public:
                 Path box;
                 box.addRoundedRectangle (0.0f, 2.0f, 6.0f, 6.0f, 0.0f);
                 
-                g.setColour (isEnabled ? Colours::blue.withAlpha (isButtonDown ? 0.3f : 0.1f)
+                g.setColour (isEnabled ? accentColour.withAlpha (isButtonDown ? 0.3f : 0.1f)
                              : Colours::lightgrey.withAlpha (0.1f));
                 
                 AffineTransform trans (AffineTransform::scale (w / 9.0f, h / 9.0f).translated (x, y));
@@ -189,7 +196,7 @@ public:
                                                    //0.0f, 0.0f,
                                                    //window.getBackgroundColour().contrasting (isActive ? 0.15f : 0.05f),
                                                    //0.0f, (float) h, false));
-                g.setColour (Colours::white);
+                g.setColour (accentColour);
                 g.fillAll();
                 
                 Font font (h * 0.65f, Font::plain);
@@ -228,7 +235,181 @@ public:
                 
                 g.drawText (window.getName(), textX, 0, textW, h, Justification::centredLeft, true);
             }
-            
+                
+    Button* createDocumentWindowButton (int buttonType) override
+            {
+                Path shape;
+                
+                if (buttonType == DocumentWindow::closeButton)
+                {
+                    shape.addLineSegment (Line<float> (0.0f, 0.0f, 1.0f, 1.0f), 0.1f);
+                    shape.addLineSegment (Line<float> (1.0f, 0.0f, 0.0f, 1.0f), 0.1f);
+                    
+                    ShapeButton* const b = new ShapeButton ("close",
+                                                            Colour (0xffffffff),
+                                                            Colour (0xffffffff),
+                                                            Colour (0xffffffff));
+                    
+                    b->setShape (shape, true, true, true);
+                    return b;
+                }
+                else if (buttonType == DocumentWindow::minimiseButton)
+                {
+                    shape.addLineSegment (Line<float> (0.0f, 0.5f, 1.0f, 0.5f), 0.1f);
+                    
+                    DrawableButton* b = new DrawableButton ("minimise", DrawableButton::ImageFitted);
+                    DrawablePath dp;
+                    dp.setPath (shape);
+                    dp.setFill (Colours::white);
+                    b->setImages (&dp);
+                    return b;
+                }
+                else if (buttonType == DocumentWindow::maximiseButton)
+                {
+                    shape.addLineSegment (Line<float> (0.5f, 0.0f, 0.5f, 1.0f), 0.1f);
+                    shape.addLineSegment (Line<float> (0.0f, 0.5f, 1.0f, 0.5f), 0.1f);
+                    
+                    DrawableButton* b = new DrawableButton ("maximise", DrawableButton::ImageFitted);
+                    DrawablePath dp;
+                    dp.setPath (shape);
+                    dp.setFill (Colours::white);
+                    b->setImages (&dp);
+                    return b;
+                }
+                
+                jassertfalse;
+                return nullptr;
+            }
+    void drawAlertBox (Graphics& g, AlertWindow& alert,
+                                                   const Rectangle<int>& textArea, TextLayout& textLayout) override
+            {
+                g.fillAll (alert.findColour (AlertWindow::backgroundColourId));
+                
+                int iconSpaceUsed = 0;
+                
+                const int iconWidth = 80;
+                int iconSize = jmin (iconWidth + 50, alert.getHeight() + 20);
+                
+                if (alert.containsAnyExtraComponents() || alert.getNumButtons() > 2)
+                    iconSize = jmin (iconSize, textArea.getHeight() + 50);
+                
+                const Rectangle<int> iconRect (iconSize / -10, iconSize / -10,
+                                               iconSize, iconSize);
+                
+                if (alert.getAlertType() != AlertWindow::NoIcon)
+                {
+                    Path icon;
+                    uint32 colour;
+                    char character;
+                    
+                    if (alert.getAlertType() == AlertWindow::WarningIcon)
+                    {
+                        colour = 0x55ff5555;
+                        character = '!';
+                        
+                        icon.addTriangle (iconRect.getX() + iconRect.getWidth() * 0.5f, (float) iconRect.getY(),
+                                          (float) iconRect.getRight(), (float) iconRect.getBottom(),
+                                          (float) iconRect.getX(), (float) iconRect.getBottom());
+                        
+                        icon = icon.createPathWithRoundedCorners (5.0f);
+                    }
+                    else
+                    {
+                        colour    = alert.getAlertType() == AlertWindow::InfoIcon ? (uint32) 0x605555ff : (uint32) 0x40b69900;
+                        character = alert.getAlertType() == AlertWindow::InfoIcon ? 'i' : '?';
+                        
+                        icon.addEllipse (iconRect.toFloat());
+                    }
+                    
+                    GlyphArrangement ga;
+                    ga.addFittedText (Font (iconRect.getHeight() * 0.9f, Font::bold),
+                                      String::charToString ((juce_wchar) (uint8) character),
+                                      (float) iconRect.getX(), (float) iconRect.getY(),
+                                      (float) iconRect.getWidth(), (float) iconRect.getHeight(),
+                                      Justification::centred, false);
+                    ga.createPath (icon);
+                    
+                    icon.setUsingNonZeroWinding (false);
+                    g.setColour (accentColour);
+                    //g.fillPath (icon);
+                    
+                    iconSpaceUsed = 0;
+                }
+                
+                g.setColour (alert.findColour (AlertWindow::textColourId));
+                
+                textLayout.draw (g, Rectangle<int> (textArea.getX() + iconSpaceUsed,
+                                                    textArea.getY(),
+                                                    textArea.getWidth() - iconSpaceUsed,
+                                                    textArea.getHeight()).toFloat());
+                
+                g.setColour (alert.findColour (AlertWindow::outlineColourId));
+                g.drawRect (0, 0, alert.getWidth(), alert.getHeight());
+            }
+
+    void drawResizableFrame (Graphics& g, int w, int h, const BorderSize<int>& border) override
+            {
+                if (! border.isEmpty())
+                {
+                    const Rectangle<int> fullSize (0, 0, w, h);
+                    //const Rectangle<int> centreArea (border.subtractedFrom (fullSize));
+                    
+                    g.saveState();
+                    
+                    //g.excludeClipRegion (centreArea);
+                    
+                    g.setColour (Colour (0xffffffff));
+                    g.drawRect (fullSize);
+                    
+                    g.setColour (Colour (0xffffffff));
+                    //g.drawRect (centreArea.expanded (1, 1));
+                    
+                    g.restoreState();
+                }
+            }
+
+
+    void createCustomTabTextLayout (const TabBarButton& button, float length, float depth,
+                                                          Colour colour, TextLayout& textLayout)
+            {
+                const float mouseOver = button.isOver() ? 0.5f: 1.0f;
+                Colour textColour;
+                textColour = colour.withAlpha(mouseOver);
+                String name;
+                name = button.getButtonText();
+                AttributedString a;
+                a.setJustification (Justification::centred);
+                
+                String category;
+                
+                if (name.containsChar (':'))
+                {
+                    category = name.upToFirstOccurrenceOf (":", false, false);
+                    name = name.fromFirstOccurrenceOf (":", false, false).trim();
+                    
+                    
+                    if (button.getHeight() > 100)
+                        category << "\n";
+                    else
+                        category << " ";
+                }
+                
+                if (category.isNotEmpty()) {
+                    Font font1 (depth * 0.5f);
+                    font1.setUnderline (button.hasKeyboardFocus (false));
+                    font1.setTypefaceName("font-middle");
+                    font1.setHeight(30.0f);
+                    a.append (category, font1, textColour);
+                }
+                Font font1 (depth * 0.5f);
+                font1.setUnderline (button.hasKeyboardFocus (false));
+                font1.setTypefaceName("Quicksand");
+                font1.setHeight(16.0f);
+                a.append (name, font1, textColour);
+                
+                textLayout.createLayout (a, length);
+            }
+                
     void drawTabButton (TabBarButton& button, Graphics& g, bool isMouseOver, bool isMouseDown) override
             {
                 const Rectangle<int> activeArea (button.getActiveArea());
@@ -257,7 +438,7 @@ public:
                     
                     //g.setGradientFill (ColourGradient (bkg.brighter (0.2f), (float) p1.x, (float) p1.y,
                                                        //bkg.darker (0.1f),   (float) p2.x, (float) p2.y, false));
-                    g.setColour(Colours::whitesmoke);
+                    g.setColour(accentColour);
                 }
                 
                 g.fillRect (activeArea);
@@ -284,7 +465,6 @@ public:
                     else if (isColourSpecified (colID))
                         col = findColour (colID);
                 }
-                
                 const Rectangle<float> area (button.getTextArea().toFloat());
                 
                 float length = area.getWidth();
@@ -294,7 +474,7 @@ public:
                     std::swap (length, depth);
                 
                 TextLayout textLayout;
-                createTabTextLayout (button, length, depth, col, textLayout);
+                createCustomTabTextLayout (button, length, depth, col, textLayout);
                 
                 AffineTransform t;
                 
@@ -357,6 +537,15 @@ public:
                 g.setColour (bar.findColour (TabbedButtonBar::tabOutlineColourId));
                 g.fillRect (line);
             }
-                
-                
-                };
+    
+    Colour getAccentColour() {
+        return accentColour;
+    }
+    
+private:
+Colour accentColour;
+};
+
+
+            
+#endif   // __ALTLOOKANDFEEL_JUCEHEADER__
