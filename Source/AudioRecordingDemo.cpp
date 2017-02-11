@@ -59,8 +59,8 @@ public:
             if (fileStream != nullptr)
             {
                 // Now create a WAV writer object that writes to our output stream...
-				OggVorbisAudioFormat oggFormat;
-                AudioFormatWriter* writer = oggFormat.createWriterFor (fileStream, sampleRate, 1, 16, StringPairArray(), 0);
+				WavAudioFormat wavFormat;
+                AudioFormatWriter* writer = wavFormat.createWriterFor (fileStream, sampleRate, 2, 16, StringPairArray(), 0);
 
                 if (writer != nullptr)
                 {
