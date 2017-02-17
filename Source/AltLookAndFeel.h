@@ -26,8 +26,7 @@ class AltLookAndFeel : public LookAndFeel_V3
 public:
     AltLookAndFeel()
     {
-        
-        accentColour = Colour (0xff9c27b0).withAlpha(1.0f);
+        accentColour = Colour(0xff9c27b0);
         LookAndFeel::setDefaultSansSerifTypefaceName("Quicksand");
         setColour(TextButton::textColourOnId, accentColour);
         setColour(TextButton::buttonColourId, Colours::white);
@@ -43,6 +42,11 @@ public:
         setColour(TabbedComponent::backgroundColourId, accentColour);
         setColour(TabbedComponent::outlineColourId, Colours::white);
         setColour(DocumentWindow::textColourId, Colours::white);
+        setColour(ProgressBar::foregroundColourId, accentColour);
+        setColour(0x1005003, /*MidiKeyboardComponent::mouseOverKeyOverlayColourId*/ accentColour);
+        setColour(0x1005004, /*MidiKeyboardComponent::keyDownOverlayColourId*/ accentColour);
+        setColour(0x1005008, /*MidiKeyboardComponent::shadowColourId*/ Colours::transparentBlack);
+        setColour(TextEditor::highlightColourId, accentColour);
         
 
     }
@@ -541,9 +545,9 @@ public:
     Colour getAccentColour() {
         return accentColour;
     }
-    
 private:
 Colour accentColour;
+
 };
 
 

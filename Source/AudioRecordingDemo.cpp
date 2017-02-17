@@ -222,8 +222,8 @@ public:
         addAndMakeVisible (recordButton);
         recordButton.setButtonText ("q:Record");
         recordButton.addListener (this);
-        recordButton.setColour (TextButton::buttonColourId, Colours::whitesmoke);
-        recordButton.setColour (TextButton::textColourOnId, Colours::darkgrey);
+        recordButton.setColour (TextButton::buttonColourId, Colours::darkgrey);
+        recordButton.setColour (TextButton::textColourOnId, Colours::whitesmoke);
         addAndMakeVisible (recordingThumbnail);
         deviceManager.addAudioCallback (&liveAudioScroller);
         deviceManager.addAudioCallback (&recorder);

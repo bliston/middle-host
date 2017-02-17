@@ -27,8 +27,8 @@ available: visit www.juce.com for more information.
 #include "InternalFilters.h"
 #include "MainHostWindow.h"
 #include "FilterIOConfiguration.h"
-#include "AudioRecordingDemo.cpp"
 #include "AltLookAndFeel.h"
+#include "AudioRecordingDemo.cpp"
 
 //==============================================================================
 class PluginWindow;
@@ -1143,7 +1143,7 @@ public:
 		menuButton3.setButtonText("k:Open Middle");
 		menuButton3.addListener(this);
 
-		addAndMakeVisible(audioRecordingDemo);
+		//addAndMakeVisible(audioRecordingDemo);
 		//menuButton4.addListener(this);
 	}
 
@@ -1161,14 +1161,14 @@ public:
 
 	void resized()
 	{
+
 		auto r = getLocalBounds().reduced(0);
-		auto ph = getLocalBounds().proportionOfHeight(0.25f);
-		auto pw = getLocalBounds().proportionOfWidth(1/3);
+		auto ph = getHeight() / 3;
 		
 		menuButton1.setBounds(r.removeFromTop(ph).reduced(0));
 		menuButton2.setBounds(r.removeFromTop(ph).reduced(0));
 		menuButton3.setBounds(r.removeFromTop(ph).reduced(0));
-		audioRecordingDemo.setBounds(r.removeFromTop(ph).reduced(0));
+		//audioRecordingDemo.setBounds(r.removeFromTop(ph).reduced(0));
 	}
 
 	void buttonClicked(Button* b) override
@@ -1209,7 +1209,7 @@ private:
 	TextButton menuButton2;
 	TextButton menuButton3;
 	TextButton menuButton4;
-	AudioRecordingDemo audioRecordingDemo;
+	//AudioRecordingDemo audioRecordingDemo;
 	ApplicationCommandManager commandManager;
 	ScopedPointer<MainHostWindow> mainWindow;
 	FilterGraph& graph;
@@ -1218,12 +1218,14 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Dashboard)
 };
 
+AudioRecordingDemo* audioRecordingDemo;
 //==============================================================================
 GraphDocumentComponent::GraphDocumentComponent(AudioPluginFormatManager& formatManager,
 	AudioDeviceManager* deviceManager_)
 	: graph(new FilterGraph(formatManager)), deviceManager(deviceManager_),
 	graphPlayer(getAppProperties().getUserSettings()->getBoolValue("doublePrecisionProcessing", false))
 {
+    
     AltLookAndFeel altLookAndFeel;
 	addAndMakeVisible(tabs = new TabbedComponent(TabbedButtonBar::TabsAtTop));
     tabs->setTabBarDepth (60);
@@ -1237,7 +1239,8 @@ GraphDocumentComponent::GraphDocumentComponent(AudioPluginFormatManager& formatM
 	keyState.addListener(&graphPlayer.getMidiMessageCollector());
 
 	addAndMakeVisible(keyboardComp = new MidiKeyboardComponent(keyState,
-		MidiKeyboardComponent::horizontalKeyboard));
+MidiKeyboardComponent::horizontalKeyboard));
+    addAndMakeVisible(audioRecordingDemo = new AudioRecordingDemo());
 
 	addAndMakeVisible(statusBar = new TooltipBar());
 
@@ -1256,12 +1259,12 @@ GraphDocumentComponent::~GraphDocumentComponent()
 
 void GraphDocumentComponent::resized()
 {
-	const int keysHeight = 60;
+	const int keysHeight = getHeight() / 4;
 	const int statusHeight = 20;
 
 	tabs->setBounds(0, 0, getWidth(), getHeight() - keysHeight);
 	statusBar->setBounds(0, getHeight() - keysHeight - statusHeight, getWidth(), statusHeight);
-	keyboardComp->setBounds(0, getHeight() - keysHeight, getWidth(), keysHeight);
+	audioRecordingDemo->setBounds(0, getHeight() - keysHeight, getWidth(), keysHeight);
 }
 
 void GraphDocumentComponent::createNewPlugin(const PluginDescription* desc, int x, int y)

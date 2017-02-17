@@ -26,6 +26,7 @@ available: visit www.juce.com for more information.
 #define __GRAPHEDITORPANEL_JUCEHEADER__
 
 #include "FilterGraph.h"
+//#include "AudioRecordingDemo.cpp"
 
 
 class FilterComponent;
