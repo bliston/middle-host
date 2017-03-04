@@ -99,23 +99,18 @@ public:
 	void resized();
 
 	//==============================================================================
-	void unfocusKeyboardComponent();
-
-	//==============================================================================
 	void releaseGraph();
 	
 private:
 	//==============================================================================
 	AudioDeviceManager* deviceManager;
 	AudioProcessorPlayer graphPlayer;
-	MidiKeyboardState keyState;
 
 public:
 	GraphEditorPanel* graphPanel;
 
 private:
 	TabbedComponent* tabs;
-	Component* keyboardComp;
 	Component* statusBar;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GraphDocumentComponent)
@@ -151,6 +146,9 @@ private:
 	AudioProcessorGraph& graph;
 	AudioProcessorGraph::Node* owner;
 	WindowFormatType type;
+    //added
+    AudioDeviceManager* deviceManager;
+    //AudioProcessorPlayer graphPlayer;
 
 	float getDesktopScaleFactor() const override { return 1.0f; }
 

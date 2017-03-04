@@ -156,11 +156,42 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProgramAudioProcessorEditor)
 };
 
+
+//==============================================================================
+/** An Extension of MidiKeyboardComponent with remapped KeyPresses
+ */
+class CustomMidiKeyboardComponent    : public MidiKeyboardComponent
+{
+public:
+    CustomMidiKeyboardComponent(MidiKeyboardState& s, Orientation o) : MidiKeyboardComponent(s, o)
+    {
+        setSize(800, 60);
+        // initialise with a default set of qwerty key-mappings..
+        const char* const keymap = "a1s2df3g4h5jk6l7;";
+        
+        for (int i = 0; keymap[i] != 0; ++i)
+            setKeyPressForNote (KeyPress (keymap[i], 0, 0), i);
+        
+    }
+    
+    ~CustomMidiKeyboardComponent()
+    {
+        
+    }
+    
+    
+    
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CustomMidiKeyboardComponent)
+};
+Component* keyboardComp;
+MidiKeyboardState keyState;
 //==============================================================================
 PluginWindow* PluginWindow::getWindowFor(AudioProcessorGraph::Node* const node,
 	WindowFormatType type,
 	AudioProcessorGraph& audioGraph)
 {
+
 	jassert(node != nullptr);
 
 	for (int i = activePluginWindows.size(); --i >= 0;)
@@ -191,10 +222,18 @@ PluginWindow* PluginWindow::getWindowFor(AudioProcessorGraph::Node* const node,
 
 	if (ui != nullptr)
 	{
-		if (AudioPluginInstance* const plugin = dynamic_cast<AudioPluginInstance*> (processor))
-			ui->setName(plugin->getName());
-
-		return new PluginWindow(ui, node, type, audioGraph);
+        if (AudioPluginInstance* const plugin = dynamic_cast<AudioPluginInstance*> (processor)) {
+    
+            ui->setName(plugin->getName());
+            
+            if (ui->getName() == "Midi Input") {
+                keyboardComp = new CustomMidiKeyboardComponent(keyState, MidiKeyboardComponent::horizontalKeyboard);
+                return new PluginWindow(keyboardComp, node, type, audioGraph);
+            }
+            else {
+                return new PluginWindow(ui, node, type, audioGraph);
+            }
+        }
 	}
 
 	return nullptr;
@@ -457,8 +496,19 @@ public:
 		g.fillRect(x, y, w, h);
 
 		g.setColour(Colours::grey);
+        
+        String name;
+        if (getName() == "Midi Input") {
+            name = "h";
+            font.setTypefaceName("font-middle");
+            font.setHeight(30.0f);
+        }
+        else {
+            name = getName();
+        }
+
 		g.setFont(font);
-		g.drawFittedText(getName(), getLocalBounds().reduced(4, 2), Justification::centred, 2);
+		g.drawFittedText(name, getLocalBounds().reduced(2, 2), Justification::centred, 2);
 
 		//g.setColour(Colours::grey);
 		//g.drawRect(x, y, w, h);
@@ -532,12 +582,16 @@ public:
 		int w = 100;
 		int h = 60;
 
-		w = jmax(w, (jmax(numIns, numOuts) + 1) * 20);
-
 		const int textWidth = font.getStringWidth(f->getProcessor()->getName());
-		w = jmax(w, 16 + jmin(textWidth, 300));
-		if (textWidth > 300)
-			h = 100;
+        
+        if (f->getProcessor()->getName() == "Midi Input") {
+            w = jmax(w, (jmax(numIns, numOuts) + 1) * 20);
+        }
+        else {
+            if (textWidth > 300)
+                h = 100;
+            w = jmax(w, 16 + jmin(textWidth, 300));
+        }
 
 		setSize(w, h);
 
@@ -1143,8 +1197,9 @@ public:
 		menuButton3.setButtonText("k:Open Middle");
 		menuButton3.addListener(this);
 
-		//addAndMakeVisible(audioRecordingDemo);
-		//menuButton4.addListener(this);
+		addAndMakeVisible(menuButton4);
+        menuButton4.setButtonText("h:Open Keyboard");
+		menuButton4.addListener(this);
 	}
 
 	~Dashboard()
@@ -1152,6 +1207,7 @@ public:
 		menuButton1.removeListener(this);
 		menuButton2.removeListener(this);
 		menuButton3.removeListener(this);
+        menuButton4.removeListener(this);
 	}
 
 	void paint(Graphics& g) override
@@ -1163,12 +1219,12 @@ public:
 	{
 
 		auto r = getLocalBounds().reduced(0);
-		auto ph = getHeight() / 3;
+		auto ph = getHeight() / 4;
 		
 		menuButton1.setBounds(r.removeFromTop(ph).reduced(0));
 		menuButton2.setBounds(r.removeFromTop(ph).reduced(0));
 		menuButton3.setBounds(r.removeFromTop(ph).reduced(0));
-		//audioRecordingDemo.setBounds(r.removeFromTop(ph).reduced(0));
+		menuButton4.setBounds(r.removeFromTop(ph).reduced(0));
 	}
 
 	void buttonClicked(Button* b) override
@@ -1199,7 +1255,15 @@ public:
 		}
 		else if (b == &menuButton4)
 		{
-			// respond to button4
+            for (int i = graph.getNumFilters(); --i >= 0;)
+            {
+                const AudioProcessorGraph::Node::Ptr f(graph.getNode(i));
+                if (f->getProcessor()->getName() == "Midi Input") {
+                    if (PluginWindow* const w = PluginWindow::getWindowFor(f, PluginWindow::Normal, graph.getGraph()))
+                        w->toFront(true);
+                }
+                
+            }
 		}
 	}
 
@@ -1209,7 +1273,6 @@ private:
 	TextButton menuButton2;
 	TextButton menuButton3;
 	TextButton menuButton4;
-	//AudioRecordingDemo audioRecordingDemo;
 	ApplicationCommandManager commandManager;
 	ScopedPointer<MainHostWindow> mainWindow;
 	FilterGraph& graph;
@@ -1217,7 +1280,7 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Dashboard)
 };
-
+        
 AudioRecordingDemo* audioRecordingDemo;
 //==============================================================================
 GraphDocumentComponent::GraphDocumentComponent(AudioPluginFormatManager& formatManager,
@@ -1238,10 +1301,7 @@ GraphDocumentComponent::GraphDocumentComponent(AudioPluginFormatManager& formatM
 
 	keyState.addListener(&graphPlayer.getMidiMessageCollector());
 
-	addAndMakeVisible(keyboardComp = new MidiKeyboardComponent(keyState,
-MidiKeyboardComponent::horizontalKeyboard));
     addAndMakeVisible(audioRecordingDemo = new AudioRecordingDemo());
-
 	addAndMakeVisible(statusBar = new TooltipBar());
 
 	deviceManager->addAudioCallback(&graphPlayer);
@@ -1259,22 +1319,18 @@ GraphDocumentComponent::~GraphDocumentComponent()
 
 void GraphDocumentComponent::resized()
 {
-	const int keysHeight = getHeight() / 4;
-	const int statusHeight = 20;
-
-	tabs->setBounds(0, 0, getWidth(), getHeight() - keysHeight);
-	statusBar->setBounds(0, getHeight() - keysHeight - statusHeight, getWidth(), statusHeight);
-	audioRecordingDemo->setBounds(0, getHeight() - keysHeight, getWidth(), keysHeight);
+    const int keysHeight = 120;
+    const int statusHeight = 20;
+    
+    tabs->setBounds (0, 0, getWidth(), getHeight() - keysHeight);
+    statusBar->setBounds (0, getHeight() - keysHeight - statusHeight, getWidth(), statusHeight);
+    //keyboardComp->setBounds (0, getHeight() - keysHeight, getWidth(), keysHeight);
+    audioRecordingDemo->setBounds (0, getHeight() - keysHeight, getWidth(), keysHeight);
 }
 
 void GraphDocumentComponent::createNewPlugin(const PluginDescription* desc, int x, int y)
 {
 	graphPanel->createNewPlugin(desc, x, y);
-}
-
-void GraphDocumentComponent::unfocusKeyboardComponent()
-{
-	keyboardComp->unfocusAllComponents();
 }
 
 void GraphDocumentComponent::releaseGraph()
