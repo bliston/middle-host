@@ -25,6 +25,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainHostWindow.h"
 #include "InternalFilters.h"
+#include "CustomLookAndFeel.h"
 
 #if ! (JUCE_PLUGINHOST_VST || JUCE_PLUGINHOST_VST3 || JUCE_PLUGINHOST_AU)
  #error "If you're building the audio plugin host, you probably want to enable VST and/or AU support"
@@ -36,21 +37,22 @@ class PluginHostApp  : public JUCEApplication,
                        private AsyncUpdater
 {
 public:
+    //ScopedPointer<Icons> icons;
     PluginHostApp() {}
-
+    
     void initialise (const String&) override
     {
         // initialise our settings file..
 
         PropertiesFile::Options options;
-        options.applicationName     = "Middle Performer";
+        options.applicationName     = "Middle";
         options.filenameSuffix      = "settings";
         options.osxLibrarySubFolder = "Preferences";
 
         appProperties = new ApplicationProperties();
         appProperties->setStorageParameters (options);
-
-        LookAndFeel::setDefaultLookAndFeel (&altLookAndFeel);
+        
+        LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
 
         mainWindow = new MainHostWindow();
         mainWindow->setUsingNativeTitleBar (true);
@@ -59,6 +61,7 @@ public:
         commandManager.registerAllCommandsForTarget (mainWindow);
 
         mainWindow->menuItemsChanged();
+        
 
         // Important note! We're going to use an async update here so that if we need
         // to re-open a file and instantiate some plugins, it will happen AFTER this
@@ -113,13 +116,14 @@ public:
             JUCEApplicationBase::quit();
     }
 
-    const String getApplicationName() override       { return "Middle Performer"; }
+
+    const String getApplicationName() override       { return "Middle"; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed() override       { return true; }
 
     ApplicationCommandManager commandManager;
     ScopedPointer<ApplicationProperties> appProperties;
-    AltLookAndFeel altLookAndFeel;
+    CustomLookAndFeel lookAndFeel;
 
 private:
     ScopedPointer<MainHostWindow> mainWindow;

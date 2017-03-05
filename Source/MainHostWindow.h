@@ -27,7 +27,6 @@
 
 #include "FilterGraph.h"
 #include "GraphEditorPanel.h"
-#include "AltLookAndFeel.h"
 
 
 //==============================================================================
@@ -42,7 +41,6 @@ namespace CommandIDs
     static const int aboutBox               = 0x30300;
     static const int allWindowsForward      = 0x30400;
     static const int toggleDoublePrecision  = 0x30500;
-    static const int help                   = 0x30600;
 }
 
 ApplicationCommandManager& getCommandManager();
@@ -84,10 +82,6 @@ public:
 
     bool tryToQuitApplication();
 
-	static ApplicationCommandManager& getApplicationCommandManager();
-
-	static AudioDeviceManager& getSharedAudioDeviceManager(ScopedPointer<XmlElement> savedAudioState = nullptr);
-
     void createPlugin (const PluginDescription* desc, int x, int y);
 
     void addPluginsToMenu (PopupMenu& m) const;
@@ -101,6 +95,7 @@ public:
 
 private:
     //==============================================================================
+    AudioDeviceManager deviceManager;
     AudioPluginFormatManager formatManager;
 
     OwnedArray <PluginDescription> internalTypes;
@@ -109,12 +104,8 @@ private:
 
     class PluginListWindow;
     ScopedPointer<PluginListWindow> pluginListWindow;
-    AltLookAndFeel altLookAndFeel;
-    void showAudioSettings();
-    void showAboutBox();
-    void showHelp();
 
-	static void runtimPermissionsCallback(bool wasGranted);
+    void showAudioSettings();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainHostWindow)
 };

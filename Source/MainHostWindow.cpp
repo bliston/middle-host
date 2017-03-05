@@ -70,25 +70,24 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListWindow)
 };
 
-static ScopedPointer<ApplicationCommandManager> applicationCommandManager;
-static ScopedPointer<AudioDeviceManager> sharedAudioDeviceManager;
-
 //==============================================================================
 MainHostWindow::MainHostWindow()
     : DocumentWindow (JUCEApplication::getInstance()->getApplicationName(), Colours::lightgrey,
                       DocumentWindow::allButtons)
 {
-    setLookAndFeel(&altLookAndFeel);
     formatManager.addDefaultFormats();
     formatManager.addFormat (new InternalPluginFormat());
 
     ScopedPointer<XmlElement> savedAudioState (getAppProperties().getUserSettings()
                                                    ->getXmlValue ("audioDeviceState"));
+
+    deviceManager.initialise (256, 256, savedAudioState, true);
+
     setResizable (true, false);
     setResizeLimits (500, 400, 10000, 10000);
     centreWithSize (800, 600);
 
-    setContentOwned (new GraphDocumentComponent (formatManager, &getSharedAudioDeviceManager(savedAudioState)), false);
+    setContentOwned (new GraphDocumentComponent (formatManager, &deviceManager), false);
 
     restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
 
@@ -127,8 +126,6 @@ MainHostWindow::~MainHostWindow()
 {
     pluginListWindow = nullptr;
     knownPluginList.removeChangeListener (this);
-    applicationCommandManager = nullptr;
-    sharedAudioDeviceManager = nullptr;
 
     if (FilterGraph* filterGraph = getGraphEditor()->graph.get())
         filterGraph->removeChangeListener (this);
@@ -164,36 +161,6 @@ bool MainHostWindow::tryToQuitApplication()
     }
 
     return false;
-}
-
-ApplicationCommandManager& MainHostWindow::getApplicationCommandManager()
-{
-	if (applicationCommandManager == nullptr)
-		applicationCommandManager = new ApplicationCommandManager();
-
-	return *applicationCommandManager;
-}
-
-AudioDeviceManager& MainHostWindow::getSharedAudioDeviceManager(ScopedPointer<XmlElement> savedAudioState)
-{
-	if (sharedAudioDeviceManager == nullptr)
-	{
-		sharedAudioDeviceManager = new AudioDeviceManager();
-		RuntimePermissions::request(RuntimePermissions::recordAudio, runtimPermissionsCallback);
-	}
-
-	if (savedAudioState != nullptr)
-	{
-		sharedAudioDeviceManager->initialise(256, 256, savedAudioState, true);
-	}
-
-	return *sharedAudioDeviceManager;
-}
-
-void MainHostWindow::runtimPermissionsCallback(bool wasGranted)
-{
-	int numInputChannels = wasGranted ? 2 : 0;
-	sharedAudioDeviceManager->initialise(numInputChannels, 2, nullptr, true, String(), nullptr);
 }
 
 void MainHostWindow::changeListenerCallback (ChangeBroadcaster* changed)
@@ -284,7 +251,6 @@ PopupMenu MainHostWindow::getMenuForIndex (int topLevelMenuIndex, const String& 
 
         menu.addSeparator();
         menu.addCommandItem (&getCommandManager(), CommandIDs::aboutBox);
-        menu.addCommandItem (&getCommandManager(), CommandIDs::help);
     }
     else if (topLevelMenuIndex == 3)
     {
@@ -339,8 +305,8 @@ void MainHostWindow::menuBarActivated (bool isActivated)
 {
     GraphDocumentComponent* const graphEditor = getGraphEditor();
 
-    //if (graphEditor != nullptr && isActivated)
-        //graphEditor->unfocusKeyboardComponent();
+    if (graphEditor != nullptr && isActivated)
+        graphEditor->unfocusKeyboardComponent();
 }
 
 void MainHostWindow::createPlugin (const PluginDescription* desc, int x, int y)
@@ -386,8 +352,7 @@ void MainHostWindow::getAllCommands (Array <CommandID>& commands)
                               CommandIDs::showAudioSettings,
                               CommandIDs::toggleDoublePrecision,
                               CommandIDs::aboutBox,
-                              CommandIDs::allWindowsForward,
-                              CommandIDs::help
+                              CommandIDs::allWindowsForward
                             };
 
     commands.addArray (ids, numElementsInArray (ids));
@@ -443,10 +408,6 @@ void MainHostWindow::getCommandInfo (const CommandID commandID, ApplicationComma
         result.setInfo ("All Windows Forward", "Bring all plug-in windows forward", category, 0);
         result.addDefaultKeypress ('w', ModifierKeys::commandModifier);
         break;
-    
-    case CommandIDs::help:
-        result.setInfo ("Help", String(), category, 0);
-        break;
 
     default:
         break;
@@ -460,9 +421,8 @@ bool MainHostWindow::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
     case CommandIDs::newFile:
-		if (graphEditor != nullptr && graphEditor->graph != nullptr && graphEditor->graph->saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
-			//graphEditor->graph->newDocument();
-			graphEditor->graph->loadFrom(File("C:\\Middle\\Presets\\major(piano)_C.filtergraph"), true);
+        if (graphEditor != nullptr && graphEditor->graph != nullptr && graphEditor->graph->saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
+            graphEditor->graph->newDocument();
         break;
 
     case CommandIDs::open:
@@ -509,7 +469,7 @@ bool MainHostWindow::perform (const InvocationInfo& info)
         break;
 
     case CommandIDs::aboutBox:
-        showAboutBox();
+        // TODO
         break;
 
     case CommandIDs::allWindowsForward:
@@ -521,11 +481,7 @@ bool MainHostWindow::perform (const InvocationInfo& info)
 
         break;
     }
-            
-    case CommandIDs::help:
-        showHelp();
-        break;
-            
+
     default:
         return false;
     }
@@ -533,112 +489,27 @@ bool MainHostWindow::perform (const InvocationInfo& info)
     return true;
 }
 
-//==============================================================================
-class AboutBoxComponent   : public Component
-{
-public:
-    AboutBoxComponent()
-    {
-        addAndMakeVisible(label0);
-        Font iconFont;
-        iconFont.setTypefaceName("font-middle");
-        iconFont.setHeight(40.0f);
-        label0.setFont(iconFont);
-        label0.setColour(Label::textColourId, altLookAndFeel.getAccentColour().withAlpha(0.2f));
-        label0.setText("k", dontSendNotification);
-        label0.setJustificationType(Justification::centred);
-        addAndMakeVisible(filler);
-        addAndMakeVisible(label1);
-        label1.setText("Middle 1.0.0", dontSendNotification);
-        label1.setJustificationType(Justification::centred);
-        addAndMakeVisible(label2);
-        label2.setText("Feb 6 2017", dontSendNotification);
-        label2.setJustificationType(Justification::centred);
-        addAndMakeVisible(label3);
-        label3.setText("www.songwish.ca", dontSendNotification);
-        label3.setJustificationType(Justification::centred);
-        setSize(300, 300);
-        addAndMakeVisible(filler);
-        addAndMakeVisible(label4);
-        label4.setFont(iconFont);
-        label4.setColour(Label::textColourId, altLookAndFeel.getAccentColour().withAlpha(0.2f));
-        label4.setJustificationType(Justification::centred);
-        label4.setText("m", dontSendNotification);
-    }
-    
-    void resized() override
-    {
-        Rectangle<int> r = getLocalBounds();
-        int percentage = getHeight() / 7;
-        
-        label0.setBounds(r.removeFromTop(percentage));
-        filler.setBounds(r.removeFromTop(percentage));
-        label1.setBounds(r.removeFromTop(percentage));
-        label2.setBounds(r.removeFromTop(percentage));
-        label3.setBounds(r.removeFromTop(percentage));
-        filler.setBounds(r.removeFromTop(percentage));
-        label4.setBounds(r.removeFromTop(percentage));
-        
-    }
-    
-private:
-    Label filler;
-    Label label0;
-    Label label1;
-    Label label2;
-    Label label3;
-    Label label4;
-    AltLookAndFeel altLookAndFeel;
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutBoxComponent)
-};
-
-void MainHostWindow::showAboutBox()
-{
-    AboutBoxComponent aboutBox;
-    
-    
-    DialogWindow::LaunchOptions o;
-    o.content.setNonOwned (&aboutBox);
-    o.dialogTitle                   = "About";
-    o.componentToCentreAround       = this;
-    o.dialogBackgroundColour        = Colours::white;
-    o.escapeKeyTriggersCloseButton  = true;
-    o.useNativeTitleBar             = false;
-    o.resizable                     = false;
-    
-    o.runModal();
-    
-}
-
-void MainHostWindow::showHelp()
-{
-    File file("/Users/andrewliston/Middle_User_Manual.pdf");
-    file.startAsProcess();
-}
-
 void MainHostWindow::showAudioSettings()
 {
-    AudioDeviceSelectorComponent audioSettingsComp (getSharedAudioDeviceManager(),
+    AudioDeviceSelectorComponent audioSettingsComp (deviceManager,
                                                     0, 256,
                                                     0, 256,
                                                     true, true, true, false);
 
-    audioSettingsComp.setLookAndFeel(&altLookAndFeel);
     audioSettingsComp.setSize (500, 450);
 
     DialogWindow::LaunchOptions o;
     o.content.setNonOwned (&audioSettingsComp);
     o.dialogTitle                   = "Audio Settings";
     o.componentToCentreAround       = this;
-    o.dialogBackgroundColour        = Colours::white;
+    o.dialogBackgroundColour        = findColour (mainBackgroundColourId);
     o.escapeKeyTriggersCloseButton  = true;
     o.useNativeTitleBar             = false;
     o.resizable                     = false;
 
     o.runModal();
 
-    ScopedPointer<XmlElement> audioState (getSharedAudioDeviceManager().createStateXml());
+    ScopedPointer<XmlElement> audioState (deviceManager.createStateXml());
 
     getAppProperties().getUserSettings()->setValue ("audioDeviceState", audioState);
     getAppProperties().getUserSettings()->saveIfNeeded();
@@ -709,3 +580,5 @@ void MainHostWindow::updatePrecisionMenuItem (ApplicationCommandInfo& info)
     info.setInfo ("Double floating point precision rendering", String(), "General", 0);
     info.setTicked (isDoublePrecisionProcessing());
 }
+
+

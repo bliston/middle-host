@@ -1,33 +1,36 @@
 /*
-==============================================================================
+  ==============================================================================
 
-This file is part of the JUCE library.
-Copyright (c) 2015 - ROLI Ltd.
+   This file is part of the JUCE library.
+   Copyright (c) 2015 - ROLI Ltd.
 
-Permission is granted to use this software under the terms of either:
-a) the GPL v2 (or any later version)
-b) the Affero GPL v3
+   Permission is granted to use this software under the terms of either:
+   a) the GPL v2 (or any later version)
+   b) the Affero GPL v3
 
-Details of these licenses can be found at: www.gnu.org/licenses
+   Details of these licenses can be found at: www.gnu.org/licenses
 
-JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+   JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+   A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-------------------------------------------------------------------------------
+   ------------------------------------------------------------------------------
 
-To release a closed-source product which uses JUCE, commercial licenses are
-available: visit www.juce.com for more information.
+   To release a closed-source product which uses JUCE, commercial licenses are
+   available: visit www.juce.com for more information.
 
-==============================================================================
+  ==============================================================================
 */
 
 #ifndef __GRAPHEDITORPANEL_JUCEHEADER__
 #define __GRAPHEDITORPANEL_JUCEHEADER__
 
 #include "FilterGraph.h"
-//#include "AudioRecordingDemo.cpp"
-
+#include "SlidingPanelComponent.h"
+#include "BinaryData.h"
+#include "AppColours.h"
+#include "CustomMidiKeyboardComponent.h"
+#include "CustomLookAndFeel.h"
 
 class FilterComponent;
 class ConnectorComponent;
@@ -36,140 +39,146 @@ class PinComponent;
 
 //==============================================================================
 /**
-A panel that displays and edits a FilterGraph.
+    A panel that displays and edits a FilterGraph.
 */
-class GraphEditorPanel : public Component,
-	public ChangeListener
+class GraphEditorPanel   : public Component,
+                           public ChangeListener
 {
 public:
-	GraphEditorPanel(FilterGraph& graph);
-	~GraphEditorPanel();
+    GraphEditorPanel (FilterGraph& graph);
+    ~GraphEditorPanel();
 
-	void paint(Graphics& g);
-	void mouseDown(const MouseEvent& e);
+    void paint (Graphics& g);
+    void mouseDown (const MouseEvent& e);
 
-	void createNewPlugin(const PluginDescription* desc, int x, int y);
+    void createNewPlugin (const PluginDescription* desc, int x, int y);
 
-	FilterComponent* getComponentForFilter(uint32 filterID) const;
-	ConnectorComponent* getComponentForConnection(const AudioProcessorGraph::Connection& conn) const;
-	PinComponent* findPinAt(int x, int y) const;
+    FilterComponent* getComponentForFilter (uint32 filterID) const;
+    ConnectorComponent* getComponentForConnection (const AudioProcessorGraph::Connection& conn) const;
+    PinComponent* findPinAt (int x, int y) const;
 
-	void resized();
-	void changeListenerCallback(ChangeBroadcaster*);
-	void updateComponents();
+    void resized();
+    void changeListenerCallback (ChangeBroadcaster*);
+    void updateComponents();
 
-	//==============================================================================
-	void beginConnectorDrag(uint32 sourceFilterID, int sourceFilterChannel,
-		uint32 destFilterID, int destFilterChannel,
-		const MouseEvent& e);
-	void dragConnector(const MouseEvent& e);
-	void endDraggingConnector(const MouseEvent& e);
+    //==============================================================================
+    void beginConnectorDrag (uint32 sourceFilterID, int sourceFilterChannel,
+                             uint32 destFilterID, int destFilterChannel,
+                             const MouseEvent& e);
+    void dragConnector (const MouseEvent& e);
+    void endDraggingConnector (const MouseEvent& e);
 
-	//==============================================================================
+    //==============================================================================
 private:
-	FilterGraph& graph;
-	ScopedPointer<ConnectorComponent> draggingConnector;
+    FilterGraph& graph;
+    ScopedPointer<ConnectorComponent> draggingConnector;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GraphEditorPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorPanel)
 };
 
 
 //==============================================================================
 /**
-A panel that embeds a GraphEditorPanel with a midi keyboard at the bottom.
+    A panel that embeds a GraphEditorPanel with a midi keyboard at the bottom.
 
-It also manages the graph itself, and plays it.
+    It also manages the graph itself, and plays it.
 */
-class GraphDocumentComponent : public Component
+class GraphDocumentComponent  : public Component
 {
 public:
-	//==============================================================================
-	GraphDocumentComponent(AudioPluginFormatManager& formatManager,
-		AudioDeviceManager* deviceManager);
-	~GraphDocumentComponent();
+    //==============================================================================
+    GraphDocumentComponent (AudioPluginFormatManager& formatManager,
+                            AudioDeviceManager* deviceManager);
+    ~GraphDocumentComponent();
 
-	//==============================================================================
-	void createNewPlugin(const PluginDescription* desc, int x, int y);
-	inline void setDoublePrecision(bool doublePrecision) { graphPlayer.setDoublePrecisionProcessing(doublePrecision); }
+    //==============================================================================
+    void createNewPlugin (const PluginDescription* desc, int x, int y);
+    inline void setDoublePrecision (bool doublePrecision) { graphPlayer.setDoublePrecisionProcessing (doublePrecision); }
 
-	//==============================================================================
-	ScopedPointer<FilterGraph> graph;
+    //==============================================================================
+    ScopedPointer<FilterGraph> graph;
 
-	//==============================================================================
-	void resized();
+    //==============================================================================
+    void resized();
 
-	//==============================================================================
-	void releaseGraph();
-	
+    //==============================================================================
+    void unfocusKeyboardComponent();
+
+    //==============================================================================
+    void releaseGraph();
+    
+    //==============================================================================
+    void paint (Graphics& g);
+    
+
 private:
-	//==============================================================================
-	AudioDeviceManager* deviceManager;
-	AudioProcessorPlayer graphPlayer;
+    //==============================================================================
+    AudioDeviceManager* deviceManager;
+    AudioProcessorPlayer graphPlayer;
+    MidiKeyboardState keyState;
 
 public:
-	GraphEditorPanel* graphPanel;
+    GraphEditorPanel* graphPanel;
+    SlidingPanelComponent* panel;
+    
 
 private:
-	TabbedComponent* tabs;
-	Component* statusBar;
+    Component* keyboardComp;
+    Component* statusBar;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GraphDocumentComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphDocumentComponent)
 };
 
 //==============================================================================
 /** A desktop window containing a plugin's UI. */
-class PluginWindow : public DocumentWindow
+class PluginWindow  : public DocumentWindow
 {
 public:
-	enum WindowFormatType
-	{
-		Normal = 0,
-		Generic,
-		Programs,
-		Parameters,
-		AudioIO,
-		NumTypes
-	};
+    enum WindowFormatType
+    {
+        Normal = 0,
+        Generic,
+        Programs,
+        Parameters,
+        AudioIO,
+        NumTypes
+    };
 
-	PluginWindow(Component* pluginEditor, AudioProcessorGraph::Node*, WindowFormatType, AudioProcessorGraph&);
-	~PluginWindow();
+    PluginWindow (Component* pluginEditor, AudioProcessorGraph::Node*, WindowFormatType, AudioProcessorGraph&);
+    ~PluginWindow();
 
-	static PluginWindow* getWindowFor(AudioProcessorGraph::Node*, WindowFormatType, AudioProcessorGraph&);
+    static PluginWindow* getWindowFor (AudioProcessorGraph::Node*, WindowFormatType, AudioProcessorGraph&);
 
-	static void closeCurrentlyOpenWindowsFor(const uint32 nodeId);
-	static void closeAllCurrentlyOpenWindows();
+    static void closeCurrentlyOpenWindowsFor (const uint32 nodeId);
+    static void closeAllCurrentlyOpenWindows();
 
-	void moved() override;
-	void closeButtonPressed() override;
+    void moved() override;
+    void closeButtonPressed() override;
 
 private:
-	AudioProcessorGraph& graph;
-	AudioProcessorGraph::Node* owner;
-	WindowFormatType type;
-    //added
-    AudioDeviceManager* deviceManager;
-    //AudioProcessorPlayer graphPlayer;
+    AudioProcessorGraph& graph;
+    AudioProcessorGraph::Node* owner;
+    WindowFormatType type;
 
-	float getDesktopScaleFactor() const override { return 1.0f; }
+    float getDesktopScaleFactor() const override     { return 1.0f; }
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginWindow)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginWindow)
 };
 
-inline String toString(PluginWindow::WindowFormatType type)
+inline String toString (PluginWindow::WindowFormatType type)
 {
-	switch (type)
-	{
-	case PluginWindow::Normal:     return "Normal";
-	case PluginWindow::Generic:    return "Generic";
-	case PluginWindow::Programs:   return "Programs";
-	case PluginWindow::Parameters: return "Parameters";
-	default:                       return String();
-	}
+    switch (type)
+    {
+        case PluginWindow::Normal:     return "Normal";
+        case PluginWindow::Generic:    return "Generic";
+        case PluginWindow::Programs:   return "Programs";
+        case PluginWindow::Parameters: return "Parameters";
+        default:                       return String();
+    }
 }
 
-inline String getLastXProp(PluginWindow::WindowFormatType type) { return "uiLastX_" + toString(type); }
-inline String getLastYProp(PluginWindow::WindowFormatType type) { return "uiLastY_" + toString(type); }
-inline String getOpenProp(PluginWindow::WindowFormatType type) { return "uiopen_" + toString(type); }
-
+inline String getLastXProp (PluginWindow::WindowFormatType type)    { return "uiLastX_" + toString (type); }
+inline String getLastYProp (PluginWindow::WindowFormatType type)    { return "uiLastY_" + toString (type); }
+inline String getOpenProp  (PluginWindow::WindowFormatType type)    { return "uiopen_"  + toString (type); }
 
 #endif   // __GRAPHEDITORPANEL_JUCEHEADER__
