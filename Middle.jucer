@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="NTe0XB0ij" name="Middle" projectType="guiapp" version="0.0.1"
               juceFolder="../../../juce" vstFolderMac="~/SDKs/vstsdk2.4" vstFolderPC="c:\SDKs\vstsdk2.4"
-              bundleIdentifier="ca.songwish.Middle" jucerVersion="4.3.1" companyName="SongWish Inc."
+              bundleIdentifier="ca.songwish.middle" jucerVersion="4.3.1" companyName="SongWish Inc."
               includeBinaryInAppConfig="1" companyWebsite="www.songwish.ca"
               companyEmail="info@songwish.ca">
   <EXPORTFORMATS>
