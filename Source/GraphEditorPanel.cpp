@@ -1132,12 +1132,14 @@ private:
                 jassert (svg != nullptr);
                 
                 thumb = Drawable::createFromSVG (*svg);
+                thumb->replaceColour(Colour (0xff448AFF), findColour(mainAccentColourId));
                 
                 // svg for thumbnail background highlight
                 ScopedPointer<XmlElement> backSvg (XmlDocument::parse (BinaryData::middle_highlight_svg));
                 jassert (backSvg != nullptr);
                 
                 hoverBackground = Drawable::createFromSVG (*backSvg);
+                hoverBackground->replaceColour(Colour (0xffDDDDDD), findColour(mainAccentColourId).withAlpha(0.3f));
                 
                 name = buttonName;
                 
@@ -1231,39 +1233,39 @@ private:
             {
                 commandManager.registerAllCommandsForTarget(mainWindow);
                 
-                TemplateOptionButton* b0 = new TemplateOptionButton (TRANS(""),
-                                                                     TemplateOptionButton::ImageFitted,
-                                                                     BinaryData::middle_blank_svg);
-                optionButtons.add (b0);
-                addAndMakeVisible (b0);
-                b0->setDescription (TRANS(""));
-                b0->addListener (this);
-                b0->setVisible(false);
                 
-                TemplateOptionButton* b1 = new TemplateOptionButton (TRANS("Key Mapper"),
-                                                                     TemplateOptionButton::ImageFitted,
-                                                                     BinaryData::middle_keys_svg);
-                optionButtons.add (b1);
-                addAndMakeVisible (b1);
-                b1->setDescription (TRANS("Remap the keys of your keyboard controller / QWERTY keyboard and sound like a pro."));
-                b1->addListener (this);
-                
-                TemplateOptionButton* b2 = new TemplateOptionButton (TRANS("Record"),
+                TemplateOptionButton* b1 = new TemplateOptionButton (TRANS("Recorder"),
                                                                      TemplateOptionButton::ImageFitted,
                                                                      BinaryData::middle_record_svg);
+                optionButtons.add (b1);
+                addAndMakeVisible (b1);
+                b1->setDescription (TRANS("Record your performances and play them back."));
+                b1->addListener (this);
+                
+                
+                TemplateOptionButton* b2 = new TemplateOptionButton (TRANS("Key Mapper"),
+                                                                     TemplateOptionButton::ImageFitted,
+                                                                     BinaryData::middle_keys_svg);
                 optionButtons.add (b2);
                 addAndMakeVisible (b2);
-                b2->setDescription (TRANS("Record your performances and play them back."));
+                b2->setDescription (TRANS("Remap the keys of your keyboard controller / QWERTY keyboard and sound like a pro."));
                 b2->addListener (this);
                 
-                TemplateOptionButton* b4 = new TemplateOptionButton (TRANS(""),
+                TemplateOptionButton* b3 = new TemplateOptionButton (TRANS("Sampled Instrument"),
                                                                      TemplateOptionButton::ImageFitted,
-                                                                     BinaryData::middle_blank_svg);
-                optionButtons.add (b4);
-                addAndMakeVisible (b4);
-                b4->setDescription (TRANS(""));
-                b4->addListener (this);
-                b4->setVisible(false);
+                                                                     BinaryData::middle_sampled_instrument_svg);
+                optionButtons.add (b3);
+                addAndMakeVisible (b3);
+                b3->setDescription (TRANS("Load a sampled instrument."));
+                b3->addListener (this);
+                //
+                //                TemplateOptionButton* b4 = new TemplateOptionButton (TRANS("Synth Instrument"),
+                //                                                                     TemplateOptionButton::ImageFitted,
+                //                                                                     BinaryData::middle_synth_instrument_svg);
+                //                optionButtons.add (b4);
+                //                addAndMakeVisible (b4);
+                //                b4->setDescription (TRANS("Load a synthesized instrument."));
+                //                b4->addListener (this);
                 
                 for (int i = 0; i < optionButtons.size(); ++i)
                     optionButtons.getUnchecked(i)->setTooltip(optionButtons.getUnchecked(i)->getDescription());
@@ -1279,7 +1281,7 @@ private:
                 audioSettingsButton->setCommandToTrigger (&commandManager, CommandIDs::showAudioSettings, true);
                 openProjectButton->setCommandToTrigger (&commandManager, CommandIDs::open, true);
                 helpButton->setCommandToTrigger (&commandManager, CommandIDs::showPluginListEditor, true);
-
+                
             }
             
             ~TemplateTileBrowser()
@@ -1290,11 +1292,11 @@ private:
             void paint (Graphics& g) override
             {
                 g.setColour (findColour (mainAccentColourId));
-                g.fillRect (getLocalBounds().removeFromTop (60));
+                g.fillRect (getLocalBounds().removeFromTop (70));
                 
                 g.setColour (findColour (mainAccentColourId).contrasting());
                 g.setFont (20.0f);
-                g.drawText ("", 0, 0, getWidth(), 60, Justification::centred, true);
+                g.drawText ("", 0, 0, getWidth(), 70, Justification::centred, true);
                 ScopedPointer<Drawable> logoBackground;
                 
                 // svg for thumbnail background highlight
@@ -1302,7 +1304,7 @@ private:
                 jassert (backSvg != nullptr);
                 
                 logoBackground = Drawable::createFromSVG (*backSvg);
-                logoBackground->drawWithin (g, getLocalBounds().removeFromTop (60).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
+                logoBackground->drawWithin (g, getLocalBounds().removeFromTop (70).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
                 
             }
             
@@ -1311,7 +1313,7 @@ private:
                 Rectangle<int> allOpts = getLocalBounds().reduced (40, 80);
                 allOpts.removeFromBottom (allOpts.getHeight() / 4);
                 
-                const int numHorizIcons = 4;
+                const int numHorizIcons = optionButtons.size();
                 const int optStep = allOpts.getWidth() / numHorizIcons;
                 
                 for (int i = 0; i < optionButtons.size(); ++i)
@@ -1328,7 +1330,6 @@ private:
                 openButtonBounds.removeFromBottom (proportionOfHeight (0.12f));
                 openButtonBounds = openButtonBounds.removeFromBottom (120);
                 openButtonBounds.reduce (50, 40);
-                
                 audioSettingsButton->setBounds (openButtonBounds.removeFromLeft (optStep - 20));
                 helpButton->setBounds (openButtonBounds.removeFromRight (optStep - 20));
                 openProjectButton->setBounds (openButtonBounds.reduced (18, 0));

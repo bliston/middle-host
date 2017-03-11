@@ -158,7 +158,7 @@ namespace BinaryData
     const int          middle_record_svgSize = 1103;
     
     extern const char* middle_highlight_svg;
-    const int          middle_highlight_svgSize = 670;
+    const int          middle_highlight_svgSize = 886;
     
     extern const char* middle_keys_svg;
     const int          middle_keys_svgSize = 1356;
@@ -168,6 +168,12 @@ namespace BinaryData
     
     extern const char* middle_blank_svg;
     const int          middle_blank_svgSize = 447;
+    
+    extern const char* middle_sampled_instrument_svg;
+    const int          middle_sampled_instrument_svgSize = 5967;
+    
+    extern const char* middle_synth_instrument_svg;
+    const int          middle_synth_instrument_svgSize = 9994;
     
     
 

@@ -46,7 +46,7 @@ public:
 	CustomLookAndFeel()
 	{
 
-		const Colour accentColour(0xff448AFF);
+		const Colour accentColour(0xff2196F3);
 		setColour(mainAccentColourId, accentColour);
 		setColour(mainBackgroundColourId, Colours::white);
 		LookAndFeel::setDefaultSansSerifTypefaceName("Quicksand");
