@@ -471,9 +471,8 @@ XmlElement* FilterGraph::createXml() const
 			String filePath = plugin->getStringAttribute("file"); // full absolute path
 			if (plugin->getStringAttribute("manufacturer") == "SongWish Inc.") 
 			{
-				File file(filePath);
-				String finalPathWithoutExtension = file.getFileNameWithoutExtension();
-				plugin->setAttribute("file", finalPathWithoutExtension);
+				String fileNameWithoutExtension = filePathToPluginPropertyString(filePath);
+				plugin->setAttribute("file", fileNameWithoutExtension);
 			}
 		}
 		xml->addChildElement(nodeXml);
@@ -506,15 +505,11 @@ void FilterGraph::restoreFromXml (const XmlElement& xml)
 			String finalPath = plugin->getStringAttribute("file");
 			if (plugin->getStringAttribute("manufacturer") == "SongWish Inc.") {
 				String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+				String folder = documentsFolder + "\\Middle\\Plugins\\SongWish\\";
 				String fileNameWithoutExtension = finalPath;
-				String fileExtension;
-
-#if JUCE_MAC
-				fileExtension = ".vst";
-#elif JUCE_WINDOWS
-				fileExtension = ".dll";
-#endif
-				finalPath = documentsFolder + "\\Middle\\VSTs\\SongWish\\" + fileNameWithoutExtension + fileExtension;
+				String winExtension = ".dll";
+				String macExtension = ".vst";
+				finalPath = pluginPropertyStringToFilePath(folder, fileNameWithoutExtension, winExtension, macExtension);
 			}
 			plugin->setAttribute("file", finalPath);
 		}
@@ -531,4 +526,24 @@ void FilterGraph::restoreFromXml (const XmlElement& xml)
     }
 
     graph.removeIllegalConnections();
+}
+
+String FilterGraph::filePathToPluginPropertyString(String filePath) const
+{
+	File file(filePath);
+	return file.getFileNameWithoutExtension();
+}
+
+String FilterGraph::pluginPropertyStringToFilePath(String folder, String fileNameWithoutExtension, String winExtension, String macExtension)
+{
+	String finalPath;
+	String fileExtension;
+
+#if JUCE_WINDOWS
+	fileExtension = winExtension;
+#elif JUCE_MAC
+	fileExtension = macExtension;
+#endif
+	finalPath = folder + fileNameWithoutExtension + fileExtension;
+	return finalPath;
 }

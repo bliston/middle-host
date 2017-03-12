@@ -97,6 +97,8 @@ public:
     Result saveDocument (const File& file) override;
     File getLastDocumentOpened() override;
     void setLastDocumentOpened (const File& file) override;
+	String filePathToPluginPropertyString(String filePath) const;
+	String pluginPropertyStringToFilePath(String folder, String fileNameWithoutExtension, String winExtension, String macExtension);
 
     //==============================================================================
 
