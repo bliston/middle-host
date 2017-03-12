@@ -464,8 +464,20 @@ XmlElement* FilterGraph::createXml() const
 {
     XmlElement* xml = new XmlElement ("FILTERGRAPH");
 
-    for (int i = 0; i < graph.getNumNodes(); ++i)
-        xml->addChildElement (createNodeXml (graph.getNode (i)));
+	for (int i = 0; i < graph.getNumNodes(); ++i)
+	{
+		XmlElement* nodeXml = createNodeXml(graph.getNode(i));
+		if (auto* plugin = nodeXml->getChildByName("PLUGIN")) {
+			String filePath = plugin->getStringAttribute("file"); // full absolute path
+			if (plugin->getStringAttribute("manufacturer") == "SongWish Inc.") 
+			{
+				File file(filePath);
+				String finalPathWithoutExtension = file.getFileNameWithoutExtension();
+				plugin->setAttribute("file", finalPathWithoutExtension);
+			}
+		}
+		xml->addChildElement(nodeXml);
+	}
 
     for (int i = 0; i < graph.getNumConnections(); ++i)
     {
@@ -490,6 +502,22 @@ void FilterGraph::restoreFromXml (const XmlElement& xml)
 
     forEachXmlChildElementWithTagName (xml, e, "FILTER")
     {
+		if (auto* plugin = e->getChildByName("PLUGIN")) {
+			String finalPath = plugin->getStringAttribute("file");
+			if (plugin->getStringAttribute("manufacturer") == "SongWish Inc.") {
+				String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+				String fileNameWithoutExtension = finalPath;
+				String fileExtension;
+
+#if JUCE_MAC
+				fileExtension = ".vst";
+#elif JUCE_WINDOWS
+				fileExtension = ".dll";
+#endif
+				finalPath = documentsFolder + "\\Middle\\VSTs\\SongWish\\" + fileNameWithoutExtension + fileExtension;
+			}
+			plugin->setAttribute("file", finalPath);
+		}
         createNodeFromXml (*e);
         changed();
     }
