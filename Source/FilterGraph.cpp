@@ -505,7 +505,7 @@ void FilterGraph::restoreFromXml (const XmlElement& xml)
 			String finalPath = plugin->getStringAttribute("file");
 			if (plugin->getStringAttribute("manufacturer") == "SongWish Inc.") {
 				String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
-				String folder = documentsFolder + "\\Middle\\Plugins\\SongWish\\";
+				String folder = documentsFolder + "/Middle/Plugins/SongWish/";
 				String fileNameWithoutExtension = finalPath;
 				String winExtension = ".dll";
 				String macExtension = ".vst";
