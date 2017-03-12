@@ -84,7 +84,7 @@ CustomMidiKeyboardComponent::CustomMidiKeyboardComponent(MidiKeyboardState& s, O
 	canScroll(true),
 	useMousePositionForVelocity(true),
 	shouldCheckMousePos(false),
-	keyMappingOctave(6),
+	keyMappingOctave(4),
 	octaveNumForMiddleC(3)
 {
 	addChildComponent(scrollDown = new CustomMidiKeyboardUpDownButton(*this, -1));
