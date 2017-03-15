@@ -426,8 +426,12 @@ bool MainHostWindow::perform (const InvocationInfo& info)
         break;
 
     case CommandIDs::open:
-        if (graphEditor != nullptr && graphEditor->graph != nullptr && graphEditor->graph->saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk)
-            graphEditor->graph->loadFromUserSpecifiedFile (true);
+            if (graphEditor != nullptr && graphEditor->graph != nullptr && graphEditor->graph->saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk) {
+                String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+                String folder = documentsFolder + "/Middle/Projects";
+                graphEditor->graph->setLastDocumentOpened(File(folder));
+                graphEditor->graph->loadFromUserSpecifiedFile (true);
+            }
         break;
 
     case CommandIDs::save:
