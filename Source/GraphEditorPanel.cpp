@@ -1115,6 +1115,40 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipBar)
 };
+        
+        //==============================================================================
+        class FunctionalTimer   : public Timer
+        {
+        public:
+            FunctionalTimer()
+            {
+
+            }
+            
+            void timerCallback() override
+            {
+                if (component1->isShowing()) {
+                    //component1->setEnabled(true);
+                    component2->grabKeyboardFocus();
+                    //delete timer;
+                    //startTimer(100);
+                }
+            }
+            
+            void setCallback(Component* comp1, Component* comp2, Timer* timr) {
+                component1 = comp1;
+                component2 = comp2;
+                timer = timr;
+            }
+            
+            
+        private:
+            Component* component1;
+            Component* component2;
+            Timer* timer;
+            
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FunctionalTimer)
+        };
 
         //==============================================================================
         /**
@@ -1431,8 +1465,10 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
 
     graphPanel->updateComponents();
     
-    setWantsKeyboardFocus (false);
-    keyboardComp->grabKeyboardFocus();
+    //this->setEnabled(false);
+    //FunctionalTimer *timer = new FunctionalTimer;
+    //timer->setCallback(this, keyboardComp, timer);
+    //timer->startTimer(100);
 }
 
 GraphDocumentComponent::~GraphDocumentComponent()
