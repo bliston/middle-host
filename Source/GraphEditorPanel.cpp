@@ -1127,7 +1127,7 @@ private:
             
             void timerCallback() override
             {
-                if (component1->isShowing()) {
+                if (component1->hasKeyboardFocus(true)) {
                     //component1->setEnabled(true);
                     component2->grabKeyboardFocus();
                     //delete timer;
@@ -1310,11 +1310,11 @@ private:
                 
                 addAndMakeVisible (audioSettingsButton  = new TemplateOptionButton ("Audio Settings",  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
                 addAndMakeVisible (openProjectButton = new TemplateOptionButton ("Open Project",  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-                addAndMakeVisible (helpButton    = new TemplateOptionButton ("Find Plugins", TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+                addAndMakeVisible (saveProjectButton    = new TemplateOptionButton ("Save Project", TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
                 
                 audioSettingsButton->setCommandToTrigger (&commandManager, CommandIDs::showAudioSettings, true);
                 openProjectButton->setCommandToTrigger (&commandManager, CommandIDs::open, true);
-                helpButton->setCommandToTrigger (&commandManager, CommandIDs::showPluginListEditor, true);
+                saveProjectButton->setCommandToTrigger (&commandManager, CommandIDs::save, true);
                 
             }
             
@@ -1365,7 +1365,7 @@ private:
                 openButtonBounds = openButtonBounds.removeFromBottom (120);
                 openButtonBounds.reduce (50, 40);
                 audioSettingsButton->setBounds (openButtonBounds.removeFromLeft (optStep - 20));
-                helpButton->setBounds (openButtonBounds.removeFromRight (optStep - 20));
+                saveProjectButton->setBounds (openButtonBounds.removeFromRight (optStep - 20));
                 openProjectButton->setBounds (openButtonBounds.reduced (18, 0));
                 
             }
@@ -1383,41 +1383,9 @@ private:
                 }
             }
             
-            void createBlankProject()
-            {
-                //showWizard (BlankAppWizard().getName());
-            }
-            
-            void openExampleProject()
-            {
-                FileChooser fc ("Open File", findExamplesFolder());
-                
-                //if (fc.browseForFileToOpen())
-                //getApp().openFile (fc.getResult());
-            }
-            
-            static File findExamplesFolder()
-            {
-                File appFolder (File::getSpecialLocation (File::currentApplicationFile));
-                
-                while (appFolder.exists()
-                       && appFolder.getParentDirectory() != appFolder)
-                {
-                    File examples (appFolder.getSiblingFile ("examples"));
-                    
-                    if (examples.exists())
-                        return examples;
-                    
-                    appFolder = appFolder.getParentDirectory();
-                }
-                
-                return File::nonexistent;
-            }
-            
         private:
             OwnedArray<TemplateOptionButton> optionButtons;
-            //NewProjectWizardClasses::WizardComp* newProjectWizard;
-            ScopedPointer<TemplateOptionButton> audioSettingsButton, openProjectButton, helpButton;
+            ScopedPointer<TemplateOptionButton> audioSettingsButton, openProjectButton, saveProjectButton;
             ApplicationCommandManager commandManager;
             ScopedPointer<MainHostWindow> mainWindow;
             FilterGraph& graph;
@@ -1465,10 +1433,9 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
 
     graphPanel->updateComponents();
     
-    //this->setEnabled(false);
-    //FunctionalTimer *timer = new FunctionalTimer;
-    //timer->setCallback(this, keyboardComp, timer);
-    //timer->startTimer(100);
+    FunctionalTimer *timer = new FunctionalTimer;
+    timer->setCallback(this, keyboardComp, timer);
+    timer->startTimer(100);
 }
 
 GraphDocumentComponent::~GraphDocumentComponent()
