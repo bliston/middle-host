@@ -1433,9 +1433,9 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
 
     graphPanel->updateComponents();
     
-    FunctionalTimer *timer = new FunctionalTimer;
-    timer->setCallback(this, keyboardComp, timer);
-    timer->startTimer(100);
+    //FunctionalTimer *timer = new FunctionalTimer;
+    //timer->setCallback(this, keyboardComp, timer);
+    //timer->startTimer(100);
 }
 
 GraphDocumentComponent::~GraphDocumentComponent()

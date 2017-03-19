@@ -462,7 +462,7 @@ void CustomMidiKeyboardComponent::paint(Graphics& g)
 
 	if (!shadowCol.isTransparent())
 	{
-		g.setGradientFill(ColourGradient(shadowCol, x1, y1, shadowCol.withAlpha(0.0f), x2, y2, false));
+		g.setColour(shadowCol);
 
 		switch (orientation)
 		{
