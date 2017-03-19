@@ -1117,37 +1117,33 @@ private:
 };
         
         //==============================================================================
-        class FunctionalTimer   : public Timer
+        class KeyboardFocusTransferer : public MouseListener
         {
         public:
-            FunctionalTimer()
+			KeyboardFocusTransferer()
             {
 
             }
             
-            void timerCallback() override
+			void mouseDown(const MouseEvent &event) override
             {
-                if (component1->hasKeyboardFocus(true)) {
-                    //component1->setEnabled(true);
-                    component2->grabKeyboardFocus();
-                    //delete timer;
-                    //startTimer(100);
+                if (transferer->hasKeyboardFocus(true) && event.mods.isLeftButtonDown()) {
+					receiver->grabKeyboardFocus();
                 }
             }
             
-            void setCallback(Component* comp1, Component* comp2, Timer* timr) {
-                component1 = comp1;
-                component2 = comp2;
-                timer = timr;
+            void setCallback(Component* _transferer, Component* _receiver) {
+                transferer = _transferer;
+                receiver = _receiver;
+				transferer->addMouseListener(this, true);
             }
             
             
         private:
-            Component* component1;
-            Component* component2;
-            Timer* timer;
+            Component* transferer;
+            Component* receiver;
             
-            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FunctionalTimer)
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardFocusTransferer)
         };
 
         //==============================================================================
@@ -1433,9 +1429,8 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
 
     graphPanel->updateComponents();
     
-    //FunctionalTimer *timer = new FunctionalTimer;
-    //timer->setCallback(this, keyboardComp, timer);
-    //timer->startTimer(100);
+	KeyboardFocusTransferer *keyboardFocusTransferer = new KeyboardFocusTransferer();
+	keyboardFocusTransferer->setCallback(this, keyboardComp);
 }
 
 GraphDocumentComponent::~GraphDocumentComponent()
