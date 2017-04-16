@@ -25,6 +25,7 @@
 #ifndef __FILTERGRAPH_JUCEHEADER__
 #define __FILTERGRAPH_JUCEHEADER__
 
+
 class FilterInGraph;
 class FilterGraph;
 

@@ -1179,13 +1179,22 @@ private:
             void paintButton (Graphics& g, bool isMouseOverButton, bool /*isButtonDown*/) override
             {
                 const Rectangle<float> r (getLocalBounds().toFloat());
-                
+
                 if (isMouseOverButton)
                 {
                     if (getStyle() == ImageFitted)
                     {
                         hoverBackground->drawWithin (g, r , RectanglePlacement::centred, 1.0);
                         thumb->drawWithin (g, r , RectanglePlacement::centred, 1.0);
+                    }
+                    else if (getStyle() == ImageAboveTextLabel)
+                    {
+                        g.setColour (findColour (mainAccentColourId).withAlpha (0.3f));
+                        g.fillRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f);
+                        g.setColour (findColour (mainAccentColourId));
+                        g.drawRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f, 1.35f);
+                        //hoverBackground->drawWithin (g, r , RectanglePlacement::centred, 1.0);
+                        thumb->drawWithin (g, getLocalBounds().reduced (0, getLocalBounds().proportionOfHeight (0.25f)).toFloat() , RectanglePlacement::centred, 1.0f);
                     }
                     else
                     {
@@ -1201,6 +1210,13 @@ private:
                     {
                         thumb->drawWithin (g, r, RectanglePlacement::centred, 1.0);
                     }
+                    else if (getStyle() == ImageAboveTextLabel)
+                    {
+                        thumb->drawWithin (g, getLocalBounds().reduced (0, getLocalBounds().proportionOfHeight (0.25f)).toFloat() , RectanglePlacement::centred, 1.0f);
+                        //thumb->drawWithin (g, getLocalBounds().removeFromTop (100).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
+                        g.setColour (findColour (mainAccentColourId));
+                        g.drawRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f, 1.35f);
+                    }
                     else
                     {
                         g.setColour (findColour (mainAccentColourId));
@@ -1209,11 +1225,17 @@ private:
                 }
                 
                 Rectangle<float> textTarget;
+                g.setColour (findColour (mainBackgroundColourId).contrasting());
                 
                 // center the text for the text buttons or position the text in the image buttons
                 if (getStyle() != ImageFitted)
                 {
                     textTarget = getLocalBounds().toFloat();
+                }
+                else if (getStyle() == ImageAboveTextLabel)
+                {
+                    textTarget = RectanglePlacement (RectanglePlacement::centred).appliedTo (thumb->getDrawableBounds(), r);
+                    textTarget = textTarget.removeFromBottom (textTarget.getHeight() * 0.3f);
                 }
                 else
                 {
@@ -1221,8 +1243,31 @@ private:
                     textTarget = textTarget.removeFromBottom (textTarget.getHeight() * 0.3f);
                 }
                 
-                g.setColour (findColour (mainBackgroundColourId).contrasting());
-                g.drawText (name, textTarget, Justification::centred, true);
+                const int textH = (getStyle() == ImageAboveTextLabel)
+                ? jmin (16, getLocalBounds().proportionOfHeight (0.25f))
+                : 0;
+                
+                if (textH > 0)
+                {
+                    g.setFont ((float) textH);
+                    
+                    g.setColour (findColour (getToggleState() ? DrawableButton::textColourOnId
+                                             : DrawableButton::textColourId)
+                                 .withMultipliedAlpha (isEnabled() ? 1.0f : 0.4f));
+                    
+                    g.drawFittedText (name,
+                                      2, getLocalBounds().getHeight() - textH - getLocalBounds().proportionOfHeight (0.25f),
+                                      getLocalBounds().getWidth() - 4, textH,
+                                      Justification::centred, 1);
+                }
+                else
+                {
+                    g.drawText (name, textTarget, Justification::centred, true);
+                }
+                
+                
+                
+                
             }
             
             void resized() override
@@ -1265,7 +1310,7 @@ private:
                 
                 
                 TemplateOptionButton* b1 = new TemplateOptionButton (TRANS("Recorder"),
-                                                                     TemplateOptionButton::ImageFitted,
+                                                                     TemplateOptionButton::ImageAboveTextLabel,
                                                                      BinaryData::middle_record_svg);
                 optionButtons.add (b1);
                 addAndMakeVisible (b1);
@@ -1274,7 +1319,7 @@ private:
                 
                 
                 TemplateOptionButton* b2 = new TemplateOptionButton (TRANS("Key Mapper"),
-                                                                     TemplateOptionButton::ImageFitted,
+                                                                     TemplateOptionButton::ImageAboveTextLabel,
                                                                      BinaryData::middle_keys_svg);
                 optionButtons.add (b2);
                 addAndMakeVisible (b2);
@@ -1282,7 +1327,7 @@ private:
                 b2->addListener (this);
                 
                 TemplateOptionButton* b3 = new TemplateOptionButton (TRANS("Sampled Instrument"),
-                                                                     TemplateOptionButton::ImageFitted,
+                                                                     TemplateOptionButton::ImageAboveTextLabel,
                                                                      BinaryData::middle_sampled_instrument_svg);
                 optionButtons.add (b3);
                 addAndMakeVisible (b3);
@@ -1304,9 +1349,12 @@ private:
                 ApplicationCommandManager& commandManager = getCommandManager();
                 
                 
-                addAndMakeVisible (audioSettingsButton  = new TemplateOptionButton ("Audio Settings",  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-                addAndMakeVisible (openProjectButton = new TemplateOptionButton ("Open Project",  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-                addAndMakeVisible (saveProjectButton    = new TemplateOptionButton ("Save Project", TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+                addAndMakeVisible (audioSettingsButton  = new TemplateOptionButton (TRANS("Audio Settings"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+                addAndMakeVisible (openProjectButton = new TemplateOptionButton (TRANS("Open Project"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+                addAndMakeVisible (saveProjectButton    = new TemplateOptionButton (TRANS("Save Project"), TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+                optionButtons.add (audioSettingsButton);
+                optionButtons.add (openProjectButton);
+                optionButtons.add (saveProjectButton);
                 
                 audioSettingsButton->setCommandToTrigger (&commandManager, CommandIDs::showAudioSettings, true);
                 openProjectButton->setCommandToTrigger (&commandManager, CommandIDs::open, true);
@@ -1321,12 +1369,12 @@ private:
             
             void paint (Graphics& g) override
             {
-                g.setColour (findColour (mainAccentColourId));
-                g.fillRect (getLocalBounds().removeFromTop (70));
+                g.setColour (Colours::white);
+                g.fillRect (getLocalBounds().removeFromTop (100));
                 
                 g.setColour (findColour (mainAccentColourId).contrasting());
                 g.setFont (20.0f);
-                g.drawText ("", 0, 0, getWidth(), 70, Justification::centred, true);
+                g.drawText ("", 0, 0, getWidth(), 100, Justification::centred, true);
                 ScopedPointer<Drawable> logoBackground;
                 
                 // svg for thumbnail background highlight
@@ -1334,35 +1382,35 @@ private:
                 jassert (backSvg != nullptr);
                 
                 logoBackground = Drawable::createFromSVG (*backSvg);
-                logoBackground->drawWithin (g, getLocalBounds().removeFromTop (70).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
+                logoBackground->replaceColour(Colours::white, findColour (mainAccentColourId));
+                logoBackground->drawWithin (g, getLocalBounds().removeFromTop (100).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
                 
             }
             
             void resized() override
             {
-                Rectangle<int> allOpts = getLocalBounds().reduced (40, 80);
-                allOpts.removeFromBottom (allOpts.getHeight() / 4);
-                
-                const int numHorizIcons = optionButtons.size();
+                Rectangle<int> allOpts = getLocalBounds().reduced (0, 0);
+                allOpts.removeFromTop (100);
+                const int numHorizIcons = optionButtons.size() / 2 ;
                 const int optStep = allOpts.getWidth() / numHorizIcons;
                 
                 for (int i = 0; i < optionButtons.size(); ++i)
                 {
                     const int yShift = i < numHorizIcons ? 0 : 1;
                     
-                    optionButtons.getUnchecked(i)->setBounds (Rectangle<int> (allOpts.getX() + (i % numHorizIcons) * optStep,
-                                                                              allOpts.getY() + yShift * allOpts.getHeight(),
-                                                                              optStep, allOpts.getHeight() / 1)
+                    if (optionButtons.getUnchecked(i)->getButtonText() == "Audio Settings" || optionButtons.getUnchecked(i)->getButtonText() == "Open Project" || optionButtons.getUnchecked(i)->getButtonText() == "Save Project") {
+                        optionButtons.getUnchecked(i)->setBounds (Rectangle<int> (allOpts.getX() + (i % numHorizIcons) * optStep,
+                                                                              allOpts.getY() + yShift * allOpts.getHeight() / 2,
+                                                                              optStep, allOpts.getHeight() / 4)
                                                               .reduced (10, 10));
+                    }
+                    else {
+                        optionButtons.getUnchecked(i)->setBounds (Rectangle<int> (allOpts.getX() + (i % numHorizIcons) * optStep,
+                                                                                  allOpts.getY() + yShift * allOpts.getHeight() / 2,
+                                                                                  optStep, allOpts.getHeight() / 2)
+                                                                  .reduced (10, 10));
+                    }
                 }
-                
-                Rectangle<int> openButtonBounds = getLocalBounds();
-                openButtonBounds.removeFromBottom (proportionOfHeight (0.12f));
-                openButtonBounds = openButtonBounds.removeFromBottom (120);
-                openButtonBounds.reduce (50, 40);
-                audioSettingsButton->setBounds (openButtonBounds.removeFromLeft (optStep - 20));
-                saveProjectButton->setBounds (openButtonBounds.removeFromRight (optStep - 20));
-                openProjectButton->setBounds (openButtonBounds.reduced (18, 0));
                 
             }
             

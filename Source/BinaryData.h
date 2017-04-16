@@ -155,13 +155,13 @@ namespace BinaryData
     const int            wizard_StaticLibrary_svgSize = 3563;
     
     extern const char* middle_record_svg;
-    const int          middle_record_svgSize = 1103;
+    const int          middle_record_svgSize = 719;
     
     extern const char* middle_highlight_svg;
     const int          middle_highlight_svgSize = 886;
     
     extern const char* middle_keys_svg;
-    const int          middle_keys_svgSize = 1356;
+    const int          middle_keys_svgSize = 641;
     
     extern const char* middle_therapeutic_logo_svg;
     const int          middle_therapeutic_logo_svgSize = 3647;
@@ -170,7 +170,7 @@ namespace BinaryData
     const int          middle_blank_svgSize = 447;
     
     extern const char* middle_sampled_instrument_svg;
-    const int          middle_sampled_instrument_svgSize = 5967;
+    const int          middle_sampled_instrument_svgSize = 5583;
     
     extern const char* middle_synth_instrument_svg;
     const int          middle_synth_instrument_svgSize = 9994;
