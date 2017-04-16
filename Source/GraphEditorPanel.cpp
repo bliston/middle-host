@@ -1369,8 +1369,8 @@ private:
             
             void paint (Graphics& g) override
             {
-                g.setColour (Colours::white);
-                g.fillRect (getLocalBounds().removeFromTop (100));
+                //g.setColour (Colours::white);
+                //g.fillRect (getLocalBounds().removeFromTop (100));
                 
                 g.setColour (findColour (mainAccentColourId).contrasting());
                 g.setFont (20.0f);

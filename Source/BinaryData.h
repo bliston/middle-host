@@ -161,7 +161,7 @@ namespace BinaryData
     const int          middle_highlight_svgSize = 886;
     
     extern const char* middle_keys_svg;
-    const int          middle_keys_svgSize = 641;
+    const int          middle_keys_svgSize = 1010;
     
     extern const char* middle_therapeutic_logo_svg;
     const int          middle_therapeutic_logo_svgSize = 3647;
