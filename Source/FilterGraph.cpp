@@ -35,8 +35,8 @@ const int FilterGraph::midiChannelNumber = 0x1000;
 FilterGraph::FilterGraph (AudioPluginFormatManager& formatManager_)
     : FileBasedDocument (filenameSuffix,
                          filenameWildcard,
-                         "Load a filter graph",
-                         "Save a filter graph"),
+                         "Load a Middle project",
+                         "Save a Middle project"),
       formatManager (formatManager_), lastUID (0)
 {
     InternalPluginFormat internalFormat;
