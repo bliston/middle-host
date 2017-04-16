@@ -76,6 +76,43 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorPanel)
 };
 
+//==============================================================================
+class KeyboardFocusTransferer : public MouseListener
+{
+public:
+    KeyboardFocusTransferer()
+    {
+        
+    }
+    
+    ~KeyboardFocusTransferer()
+    {
+        transferer->removeMouseListener(this);
+        transferer = nullptr;
+        receiver = nullptr;
+    }
+    
+    
+    void mouseDown(const MouseEvent &event) override
+    {
+        if (transferer->hasKeyboardFocus(true) && event.mods.isLeftButtonDown()) {
+            receiver->grabKeyboardFocus();
+        }
+    }
+    
+    void setCallback(Component* _transferer, Component* _receiver) {
+        transferer = _transferer;
+        receiver = _receiver;
+        transferer->addMouseListener(this, true);
+    }
+    
+    
+private:
+    Component* transferer;
+    Component* receiver;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardFocusTransferer)
+};
 
 //==============================================================================
 /**
@@ -125,9 +162,11 @@ public:
 private:
     Component* keyboardComp;
     Component* statusBar;
+    KeyboardFocusTransferer* keyboardFocusTransferer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphDocumentComponent)
 };
+
 
 //==============================================================================
 /** A desktop window containing a plugin's UI. */

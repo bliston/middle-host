@@ -1116,35 +1116,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipBar)
 };
         
-        //==============================================================================
-        class KeyboardFocusTransferer : public MouseListener
-        {
-        public:
-			KeyboardFocusTransferer()
-            {
 
-            }
-            
-			void mouseDown(const MouseEvent &event) override
-            {
-                if (transferer->hasKeyboardFocus(true) && event.mods.isLeftButtonDown()) {
-					receiver->grabKeyboardFocus();
-                }
-            }
-            
-            void setCallback(Component* _transferer, Component* _receiver) {
-                transferer = _transferer;
-                receiver = _receiver;
-				transferer->addMouseListener(this, true);
-            }
-            
-            
-        private:
-            Component* transferer;
-            Component* receiver;
-            
-            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardFocusTransferer)
-        };
 
         //==============================================================================
         /**
@@ -1349,12 +1321,30 @@ private:
                 ApplicationCommandManager& commandManager = getCommandManager();
                 
                 
-                addAndMakeVisible (audioSettingsButton  = new TemplateOptionButton (TRANS("Audio Settings"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-                addAndMakeVisible (openProjectButton = new TemplateOptionButton (TRANS("Open Project"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-                addAndMakeVisible (saveProjectButton    = new TemplateOptionButton (TRANS("Save Project"), TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+                TemplateOptionButton* audioSettingsButton = new TemplateOptionButton (TRANS("Audio Settings"),
+                                                                     TemplateOptionButton::ImageOnButtonBackground,
+                                                                     BinaryData::middle_sampled_instrument_svg);
                 optionButtons.add (audioSettingsButton);
+                addAndMakeVisible (audioSettingsButton);
+                
+                TemplateOptionButton* openProjectButton = new TemplateOptionButton (TRANS("Open Project"),
+                                                                                      TemplateOptionButton::ImageOnButtonBackground,
+                                                                                      BinaryData::middle_sampled_instrument_svg);
                 optionButtons.add (openProjectButton);
+                addAndMakeVisible (openProjectButton);
+                
+                TemplateOptionButton* saveProjectButton = new TemplateOptionButton (TRANS("Save Project"),
+                                                                                    TemplateOptionButton::ImageOnButtonBackground,
+                                                                                    BinaryData::middle_sampled_instrument_svg);
                 optionButtons.add (saveProjectButton);
+                addAndMakeVisible (saveProjectButton);
+                
+//                addAndMakeVisible (audioSettingsButton  = new TemplateOptionButton (TRANS("Audio Settings"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+//                addAndMakeVisible (openProjectButton = new TemplateOptionButton (TRANS("Open Project"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+//                addAndMakeVisible (saveProjectButton    = new TemplateOptionButton (TRANS("Save Project"), TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
+//                optionButtons.add (audioSettingsButton);
+//                optionButtons.add (openProjectButton);
+//                optionButtons.add (saveProjectButton);
                 
                 audioSettingsButton->setCommandToTrigger (&commandManager, CommandIDs::showAudioSettings, true);
                 openProjectButton->setCommandToTrigger (&commandManager, CommandIDs::open, true);
@@ -1429,7 +1419,7 @@ private:
             
         private:
             OwnedArray<TemplateOptionButton> optionButtons;
-            ScopedPointer<TemplateOptionButton> audioSettingsButton, openProjectButton, saveProjectButton;
+            //ScopedPointer<TemplateOptionButton> audioSettingsButton, openProjectButton, saveProjectButton;
             ApplicationCommandManager commandManager;
             ScopedPointer<MainHostWindow> mainWindow;
             FilterGraph& graph;
@@ -1477,15 +1467,15 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
 
     graphPanel->updateComponents();
     
-	KeyboardFocusTransferer *keyboardFocusTransferer = new KeyboardFocusTransferer();
+	keyboardFocusTransferer = new KeyboardFocusTransferer();
 	keyboardFocusTransferer->setCallback(this, keyboardComp);
 }
 
 GraphDocumentComponent::~GraphDocumentComponent()
 {
     releaseGraph();
-
     keyState.removeListener (&graphPlayer.getMidiMessageCollector());
+    keyboardFocusTransferer->~KeyboardFocusTransferer();
 }
 
 void GraphDocumentComponent::resized()
