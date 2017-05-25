@@ -77,6 +77,147 @@ void PluginWindow::closeAllCurrentlyOpenWindows()
 }
 
 //==============================================================================
+class PluginEditor;
+static Array <PluginEditor*> activePluginEditors;
+
+PluginEditor::PluginEditor (Component* const pluginEditor,
+                            AudioProcessorGraph::Node* const o,
+                            WindowFormatType t,
+                            AudioProcessorGraph& audioGraph)
+:
+graph (audioGraph),
+owner (o),
+type (t)
+{
+    
+    setSize (getHeight(), getWidth());
+    
+    addAndMakeVisible(pluginEditor);
+    
+    setVisible (true);
+    
+    activePluginEditors.add (this);
+}
+
+void PluginEditor::closePluginEditorsFor (const uint32 nodeId)
+{
+    for (int i = activePluginEditors.size(); --i >= 0;)
+        if (activePluginEditors.getUnchecked(i)->owner->nodeId == nodeId)
+        {
+            auto processor = activePluginEditors.getUnchecked (i)->owner->getProcessor();
+            closeProcessor(processor);
+        }
+}
+
+void PluginEditor::closeAllPluginEditors()
+{
+    if (activePluginEditors.size() > 0)
+    {
+        for (int i = activePluginEditors.size(); --i >= 0;)
+        {
+            auto processor = activePluginEditors.getUnchecked (i)->owner->getProcessor();
+            closeProcessor(processor);
+        }
+        
+        Component dummyModalComp;
+        dummyModalComp.enterModalState();
+        MessageManager::getInstance()->runDispatchLoopUntil (50);
+    }
+}
+
+void PluginEditor::clearContentComponent()
+{
+    removeAllChildren();
+    deleteAllChildren();
+
+}
+
+void* PluginEditor::deleteComponent (void* userData)
+{
+    Component* comp = static_cast<Component*>(userData);
+    //Component* top = comp->getTopLevelComponent();
+    //delete top;
+    delete comp;
+    return 0;
+}
+void PluginEditor::closeProcessor (AudioProcessor* processor)
+{
+    if (processor)
+    {
+        AudioProcessorEditor* editor = processor->getActiveEditor ();
+        
+        if (editor)
+        {
+            MessageManager::getInstance()->callFunctionOnMessageThread (
+                                                                        deleteComponent, editor);
+        }
+        
+        processor->releaseResources ();
+    }
+}
+
+void PluginEditor::resized()
+{
+    setBounds(getLocalBounds());
+}
+
+
+//==============================================================================
+PluginEditor* PluginEditor::getPluginEditorFor (AudioProcessorGraph::Node* const node,
+                                          WindowFormatType type,
+                                          AudioProcessorGraph& audioGraph)
+{
+    jassert (node != nullptr);
+    
+    for (int i = activePluginEditors.size(); --i >= 0;)
+        if (activePluginEditors.getUnchecked(i)->owner == node
+            && activePluginEditors.getUnchecked(i)->type == type)
+            return activePluginEditors.getUnchecked(i);
+    
+    AudioProcessor* processor = node->getProcessor();
+    AudioProcessorEditor* ui = nullptr;
+    
+    if (type == Normal)
+    {
+        ui = processor->createEditorIfNeeded();
+        
+        if (ui == nullptr)
+            type = Generic;
+    }
+    
+    if (ui == nullptr)
+    {
+        if (type == Generic || type == Parameters)
+            ui = new GenericAudioProcessorEditor (processor);
+        //else if (type == Programs)
+            //ui = new ProgramAudioProcessorEditor (processor);
+        else if (type == AudioIO)
+            ui = new FilterIOConfigurationWindow (processor);
+    }
+    
+    if (ui != nullptr)
+    {
+        if (AudioPluginInstance* const plugin = dynamic_cast<AudioPluginInstance*> (processor))
+            ui->setName (plugin->getName());
+        
+        return new PluginEditor (ui, node, type, audioGraph);
+    }
+    
+    return nullptr;
+}
+
+PluginEditor::~PluginEditor()
+{
+    activePluginEditors.removeFirstMatchingValue (this);
+    //closeAllPluginEditors();
+    
+    
+}
+
+
+
+
+//==============================================================================
 class ProcessorProgramPropertyComp : public PropertyComponent,
                                      private AudioProcessorListener
 {
@@ -1115,342 +1256,558 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipBar)
 };
+
+
         
-
-
-        //==============================================================================
-        /**
-         Template option tile button.
-         The drawable button object class for the tile icons and buttons in the TemplateTileBrowser
-         */
-        class TemplateOptionButton   : public DrawableButton
+/** Simple list box that just displays a StringArray. */
+class FileListBoxModel   : public ListBoxModel
+{
+public:
+    FileListBoxModel (const Array<String>& list, FilterGraph& graph_)
+    : midiMessageList (list), graph(graph_)
+    {
+    }
+    
+    int getNumRows() override    { return midiMessageList.size(); }
+    
+    void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
+    {
+        if (isPositiveAndBelow (row, midiMessageList.size()))
         {
-        public:
-            TemplateOptionButton (const String& buttonName, ButtonStyle buttonStyle, const char* thumbSvg)
-            : DrawableButton (buttonName, buttonStyle)
-            {
-                // svg for thumbnail icon
-                ScopedPointer<XmlElement> svg (XmlDocument::parse (thumbSvg));
-                jassert (svg != nullptr);
-                
-                thumb = Drawable::createFromSVG (*svg);
-                thumb->replaceColour(Colour (0xff448AFF), findColour(mainAccentColourId));
-                
-                // svg for thumbnail background highlight
-                ScopedPointer<XmlElement> backSvg (XmlDocument::parse (BinaryData::middle_highlight_svg));
-                jassert (backSvg != nullptr);
-                
-                hoverBackground = Drawable::createFromSVG (*backSvg);
-                hoverBackground->replaceColour(Colour (0xffDDDDDD), findColour(mainAccentColourId).withAlpha(0.3f));
-                
-                name = buttonName;
-                
-                description = "<insert description>";
-            }
+            const String& message = midiMessageList.getReference (row);
             
-            void paintButton (Graphics& g, bool isMouseOverButton, bool /*isButtonDown*/) override
-            {
-                const Rectangle<float> r (getLocalBounds().toFloat());
+            if (rowIsSelected) {
+                if (row == midiMessageList.indexOf(graph.getLastDocumentOpened().getFileNameWithoutExtension()))
+                g.fillAll (Colours::skyblue.withAlpha (0.3f));
+            }
 
-                if (isMouseOverButton)
-                {
-                    if (getStyle() == ImageFitted)
-                    {
-                        hoverBackground->drawWithin (g, r , RectanglePlacement::centred, 1.0);
-                        thumb->drawWithin (g, r , RectanglePlacement::centred, 1.0);
-                    }
-                    else if (getStyle() == ImageAboveTextLabel)
-                    {
-                        g.setColour (findColour (mainAccentColourId).withAlpha (0.3f));
-                        g.fillRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f);
-                        g.setColour (findColour (mainAccentColourId));
-                        g.drawRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f, 1.35f);
-                        //hoverBackground->drawWithin (g, r , RectanglePlacement::centred, 1.0);
-                        thumb->drawWithin (g, getLocalBounds().reduced (0, getLocalBounds().proportionOfHeight (0.25f)).toFloat() , RectanglePlacement::centred, 1.0f);
-                    }
-                    else
-                    {
-                        g.setColour (findColour (mainAccentColourId).withAlpha (0.3f));
-                        g.fillRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f);
-                        g.setColour (findColour (mainAccentColourId));
-                        g.drawRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f, 1.35f);
-                    }
-                }
-                else
-                {
-                    if (getStyle() == ImageFitted)
-                    {
-                        thumb->drawWithin (g, r, RectanglePlacement::centred, 1.0);
-                    }
-                    else if (getStyle() == ImageAboveTextLabel)
-                    {
-                        thumb->drawWithin (g, getLocalBounds().reduced (0, getLocalBounds().proportionOfHeight (0.25f)).toFloat() , RectanglePlacement::centred, 1.0f);
-                        //thumb->drawWithin (g, getLocalBounds().removeFromTop (100).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
-                        g.setColour (findColour (mainAccentColourId));
-                        g.drawRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f, 1.35f);
-                    }
-                    else
-                    {
-                        g.setColour (findColour (mainAccentColourId));
-                        g.drawRoundedRectangle (r.reduced (2.0f, 2.0f), 10.0f, 1.35f);
-                    }
-                }
-                
-                Rectangle<float> textTarget;
-                g.setColour (findColour (mainBackgroundColourId).contrasting());
-                
-                // center the text for the text buttons or position the text in the image buttons
-                if (getStyle() != ImageFitted)
-                {
-                    textTarget = getLocalBounds().toFloat();
-                }
-                else if (getStyle() == ImageAboveTextLabel)
-                {
-                    textTarget = RectanglePlacement (RectanglePlacement::centred).appliedTo (thumb->getDrawableBounds(), r);
-                    textTarget = textTarget.removeFromBottom (textTarget.getHeight() * 0.3f);
-                }
-                else
-                {
-                    textTarget = RectanglePlacement (RectanglePlacement::centred).appliedTo (thumb->getDrawableBounds(), r);
-                    textTarget = textTarget.removeFromBottom (textTarget.getHeight() * 0.3f);
-                }
-                
-                const int textH = (getStyle() == ImageAboveTextLabel)
-                ? jmin (16, getLocalBounds().proportionOfHeight (0.25f))
-                : 0;
-                
-                if (textH > 0)
-                {
-                    g.setFont ((float) textH);
-                    
-                    g.setColour (findColour (getToggleState() ? DrawableButton::textColourOnId
-                                             : DrawableButton::textColourId)
-                                 .withMultipliedAlpha (isEnabled() ? 1.0f : 0.4f));
-                    
-                    g.drawFittedText (name,
-                                      2, getLocalBounds().getHeight() - textH - getLocalBounds().proportionOfHeight (0.25f),
-                                      getLocalBounds().getWidth() - 4, textH,
-                                      Justification::centred, 1);
-                }
-                else
-                {
-                    g.drawText (name, textTarget, Justification::centred, true);
-                }
-                
-                
-                
-                
-            }
+            g.setColour (Colours::black);
             
-            void resized() override
-            {
-                thumb->setBoundsToFit (0, 0, getWidth(), getHeight(), Justification::centred, false);
-            }
-            
-            void setDescription (String descript) noexcept
-            {
-                description = descript;
-            }
-            
-            String getDescription() const noexcept
-            {
-                return description;
-            }
-            
-        private:
-            ScopedPointer<Drawable> thumb, hoverBackground;
-            String name, description;
-            
-            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TemplateOptionButton)
-        };
-        
-        
-        
-        //==============================================================================
-        /**
-         Project Template Component for front page.
-         Features multiple icon buttons to select the type of project template
-         */
-        class TemplateTileBrowser   : public Component,
-        private Button::Listener
+            g.drawText (message,
+                        Rectangle<int> (width, height).reduced (4, 0),
+                        Justification::centredLeft, true);
+        }
+    }
+    
+    void listBoxItemClicked (int row, const MouseEvent &) override
+    {
+        if (isPositiveAndBelow (row, midiMessageList.size()))
         {
-        public:
-            TemplateTileBrowser (FilterGraph& graph_)
-            : graph(graph_)
-            {
-                commandManager.registerAllCommandsForTarget(mainWindow);
-                
-                
-                TemplateOptionButton* b1 = new TemplateOptionButton (TRANS("Recorder"),
-                                                                     TemplateOptionButton::ImageAboveTextLabel,
-                                                                     BinaryData::middle_record_svg);
-                optionButtons.add (b1);
-                addAndMakeVisible (b1);
-                b1->setDescription (TRANS("Record your performances and play them back."));
-                b1->addListener (this);
-                
-                
-                TemplateOptionButton* b2 = new TemplateOptionButton (TRANS("Key Mapper"),
-                                                                     TemplateOptionButton::ImageAboveTextLabel,
-                                                                     BinaryData::middle_keys_svg);
-                optionButtons.add (b2);
-                addAndMakeVisible (b2);
-                b2->setDescription (TRANS("Remap the keys of your keyboard controller / QWERTY keyboard and sound like a pro."));
-                b2->addListener (this);
-                
-                TemplateOptionButton* b3 = new TemplateOptionButton (TRANS("Sampled Instrument"),
-                                                                     TemplateOptionButton::ImageAboveTextLabel,
-                                                                     BinaryData::middle_sampled_instrument_svg);
-                optionButtons.add (b3);
-                addAndMakeVisible (b3);
-                b3->setDescription (TRANS("Load a sampled instrument."));
-                b3->addListener (this);
-                //
-                //                TemplateOptionButton* b4 = new TemplateOptionButton (TRANS("Synth Instrument"),
-                //                                                                     TemplateOptionButton::ImageFitted,
-                //                                                                     BinaryData::middle_synth_instrument_svg);
-                //                optionButtons.add (b4);
-                //                addAndMakeVisible (b4);
-                //                b4->setDescription (TRANS("Load a synthesized instrument."));
-                //                b4->addListener (this);
-                
-                for (int i = 0; i < optionButtons.size(); ++i)
-                    optionButtons.getUnchecked(i)->setTooltip(optionButtons.getUnchecked(i)->getDescription());
-                
-                //Handle Open Project button functionality
-                ApplicationCommandManager& commandManager = getCommandManager();
-                
-                
-                TemplateOptionButton* audioSettingsButton = new TemplateOptionButton (TRANS("Audio Settings"),
-                                                                     TemplateOptionButton::ImageOnButtonBackground,
-                                                                     BinaryData::middle_sampled_instrument_svg);
-                optionButtons.add (audioSettingsButton);
-                addAndMakeVisible (audioSettingsButton);
-                
-                TemplateOptionButton* openProjectButton = new TemplateOptionButton (TRANS("Open Project"),
-                                                                                      TemplateOptionButton::ImageOnButtonBackground,
-                                                                                      BinaryData::middle_sampled_instrument_svg);
-                optionButtons.add (openProjectButton);
-                addAndMakeVisible (openProjectButton);
-                
-                TemplateOptionButton* saveProjectButton = new TemplateOptionButton (TRANS("Save Project"),
-                                                                                    TemplateOptionButton::ImageOnButtonBackground,
-                                                                                    BinaryData::middle_sampled_instrument_svg);
-                optionButtons.add (saveProjectButton);
-                addAndMakeVisible (saveProjectButton);
-                
-//                addAndMakeVisible (audioSettingsButton  = new TemplateOptionButton (TRANS("Audio Settings"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-//                addAndMakeVisible (openProjectButton = new TemplateOptionButton (TRANS("Open Project"),  TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-//                addAndMakeVisible (saveProjectButton    = new TemplateOptionButton (TRANS("Save Project"), TemplateOptionButton::ImageOnButtonBackground, BinaryData::wizard_Openfile_svg));
-//                optionButtons.add (audioSettingsButton);
-//                optionButtons.add (openProjectButton);
-//                optionButtons.add (saveProjectButton);
-                
-                audioSettingsButton->setCommandToTrigger (&commandManager, CommandIDs::showAudioSettings, true);
-                openProjectButton->setCommandToTrigger (&commandManager, CommandIDs::open, true);
-                saveProjectButton->setCommandToTrigger (&commandManager, CommandIDs::save, true);
-                
-            }
-            
-            ~TemplateTileBrowser()
-            {
-                
-            }
-            
-            void paint (Graphics& g) override
-            {
-                //g.setColour (Colours::white);
-                //g.fillRect (getLocalBounds().removeFromTop (100));
-                
-                g.setColour (findColour (mainAccentColourId).contrasting());
-                g.setFont (20.0f);
-                g.drawText ("", 0, 0, getWidth(), 100, Justification::centred, true);
-                ScopedPointer<Drawable> logoBackground;
-                
-                // svg for thumbnail background highlight
-                ScopedPointer<XmlElement> backSvg (XmlDocument::parse (BinaryData::middle_therapeutic_logo_svg));
-                jassert (backSvg != nullptr);
-                
-                logoBackground = Drawable::createFromSVG (*backSvg);
-                logoBackground->replaceColour(Colours::white, findColour (mainAccentColourId));
-                logoBackground->drawWithin (g, getLocalBounds().removeFromTop (100).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
-                
-            }
-            
-            void resized() override
-            {
-                Rectangle<int> allOpts = getLocalBounds().reduced (0, 0);
-                allOpts.removeFromTop (100);
-                const int numHorizIcons = optionButtons.size() / 2 ;
-                const int optStep = allOpts.getWidth() / numHorizIcons;
-                
-                for (int i = 0; i < optionButtons.size(); ++i)
-                {
-                    const int yShift = i < numHorizIcons ? 0 : 1;
-                    
-                    if (optionButtons.getUnchecked(i)->getButtonText() == "Audio Settings" || optionButtons.getUnchecked(i)->getButtonText() == "Open Project" || optionButtons.getUnchecked(i)->getButtonText() == "Save Project") {
-                        optionButtons.getUnchecked(i)->setBounds (Rectangle<int> (allOpts.getX() + (i % numHorizIcons) * optStep,
-                                                                              allOpts.getY() + yShift * allOpts.getHeight() / 2,
-                                                                              optStep, allOpts.getHeight() / 4)
-                                                              .reduced (10, 10));
-                    }
-                    else {
-                        optionButtons.getUnchecked(i)->setBounds (Rectangle<int> (allOpts.getX() + (i % numHorizIcons) * optStep,
-                                                                                  allOpts.getY() + yShift * allOpts.getHeight() / 2,
-                                                                                  optStep, allOpts.getHeight() / 2)
-                                                                  .reduced (10, 10));
-                    }
-                }
-                
-            }
-            
-            void showPlugin (const String& name)
-            {
-                for (int i = graph.getNumFilters(); --i >= 0;)
-                {
-                    const AudioProcessorGraph::Node::Ptr f(graph.getNode(i));
-                    if (f->getProcessor()->getName() == name) {
-                        if (PluginWindow* const w = PluginWindow::getWindowFor(f, PluginWindow::Normal, graph.getGraph()))
-                            w->toFront(true);
-                    }
-                    
-                }
-            }
-            
-        private:
-            OwnedArray<TemplateOptionButton> optionButtons;
-            //ScopedPointer<TemplateOptionButton> audioSettingsButton, openProjectButton, saveProjectButton;
-            ApplicationCommandManager commandManager;
-            ScopedPointer<MainHostWindow> mainWindow;
-            FilterGraph& graph;
-            
-            void buttonClicked (Button* b) override
-            {
+            String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+            String folder = documentsFolder + "/Middle/Projects/Presets/";
+            const String& message = midiMessageList.getReference (row);
+            graph.loadFrom(File(folder + message + ".middle"), true);
+        }
+        
+    }
+    
+    
+    
+private:
+    const Array<String>& midiMessageList;
+    FilterGraph& graph;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileListBoxModel)
+};
+        
+        
 
-                if (dynamic_cast<TemplateOptionButton*> (b) != nullptr)
-                    showPlugin (b->getButtonText());
-                
-            }
-            
-            void buttonStateChanged (Button*) override
-            {
-                repaint();
-            }
-            
-            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TemplateTileBrowser)
-        };
+//==============================================================================
+class FileListBoxComponent  : public Component,
+private AsyncUpdater
+{
+public:
+    FileListBoxComponent (FilterGraph& graph_)
+    : midiLogListBoxModel (midiMessageList, graph_), graph(graph_)
+    {
+        setOpaque (false);
+        addAndMakeVisible(titleLabel);
+        titleLabel.setText("Song Presets", dontSendNotification);
+        titleLabel.setColour(Label::textColourId, findColour(mainAccentColourId));
+        titleLabel.setJustificationType(Justification::centred);
+        addAndMakeVisible (messageListBox);
+        messageListBox.setModel (&midiLogListBoxModel);
+        messageListBox.setMultipleSelectionEnabled(false);
+        messageListBox.setRowHeight(25);
+        messageListBox.setColour(ListBox::backgroundColourId, findColour(lightAccentColourId));
+        fillList();
+        
+    }
+    
+    ~FileListBoxComponent()
+    {
 
+    }
+    
+    void paint (Graphics& g) override
+    {
+        g.fillAll (Colours::transparentWhite);
+        
+        ScopedPointer<Drawable> logoBackground;
+        // svg for thumbnail background highlight
+        ScopedPointer<XmlElement> backSvg (XmlDocument::parse (BinaryData::middle_therapeutic_logo_svg));
+        jassert (backSvg != nullptr);
+        
+//        logoBackground = Drawable::createFromSVG (*backSvg);
+//        logoBackground->replaceColour(Colours::white, findColour(mainAccentColourId));
+//        logoBackground->drawWithin (g, getLocalBounds().removeFromBottom (250).reduced (80).toFloat() , RectanglePlacement::centred, 1.0f);
+    }
+    
+    void resized() override
+    {
+        Rectangle<int> area (getLocalBounds());
+        titleLabel.setBounds(area.removeFromTop(20));
+        messageListBox.setBounds (area.reduced (8));
+    }
+    
+    void fillList ()
+    {
+        clearMessagesFromList();
+        String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+        String folder = documentsFolder + "/Middle/Projects";
+        DirectoryIterator iter (File (folder), true, "*.middle*");
+        
+        while (iter.next())
+        {
+            File theFileItFound (iter.getFile());
+            addMessageToList (theFileItFound.getFileNameWithoutExtension());
+        }
+        
+        selectOpenedListItem();
+    }
+    
+    void selectOpenedListItem() {
+        int indexOfDocumentTitle;
+        indexOfDocumentTitle = midiMessageList.indexOf(graph.getLastDocumentOpened().getFileName());
+        messageListBox.selectRow(indexOfDocumentTitle);
+    }
+    
+    void addMessageToList (const String& message)
+    {
+        midiMessageList.add (message);
+        triggerAsyncUpdate();
+    }
+    
+    void clearMessagesFromList ()
+    {
+        midiMessageList.clear();
+        triggerAsyncUpdate();
+    }
+    
+    void handleAsyncUpdate() override
+    {
+        //fillList();
+        messageListBox.updateContent();
+        messageListBox.repaint();
+    }
+    
+
+private:
+    ListBox messageListBox;
+    Array<String> midiMessageList;
+    FileListBoxModel midiLogListBoxModel;
+    FilterGraph& graph;
+    int iterNumFiles;
+    Label titleLabel;
+    
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileListBoxComponent)
+};
+
+
+
+//==============================================================================
+class PresetBrowser   : public Component,
+public DragAndDropContainer,
+private Button::Listener,
+private FileBrowserListener
+{
+public:
+    PresetBrowser(FilterGraph* graph_)
+    : moviesWildcardFilter ("*.middle", "*.middle", "Movies File Filter"),
+    directoryThread ("Movie File Scanner Thread"),
+    movieList (&moviesWildcardFilter, directoryThread),
+    fileTree (movieList),
+    resizerBar (&stretchableManager, 1, false),
+    graph(graph_)
+    {
+        setOpaque (false);
+        String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+        String folder = documentsFolder + "/Middle/Projects/Presets";
+        movieList.setDirectory (File(folder), true, true);
+        directoryThread.startThread (1);
+        
+        fileTree.addListener (this);
+        fileTree.setColour (FileTreeComponent::backgroundColourId, Colours::whitesmoke.withAlpha (0.2f));
+        fileTree.setColour (FileTreeComponent::highlightColourId, Colours::lightskyblue);
+        addAndMakeVisible (fileTree);
+        
+        addAndMakeVisible (resizerBar);
+        
+        // we have to set up our StretchableLayoutManager so it know the limits and preferred sizes of it's contents
+        stretchableManager.setItemLayout (0,            // for the fileTree
+                                          -0.1, -0.9,   // must be between 50 pixels and 90% of the available space
+                                          -1.0);        // and its preferred size is 30% of the total available space
+//        
+//        stretchableManager.setItemLayout (1,            // for the resize bar
+//                                          5, 5, 5);     // hard limit to 5 pixels
+//        
+//        stretchableManager.setItemLayout (2,            // for the movie components
+//                                          -0.1, -0.9,   // size must be between 50 pixels and 90% of the available space
+//                                          -0.7);        // and its preferred size is 70% of the total available space
+    }
+    
+    ~PresetBrowser()
+    {
+        fileTree.removeListener (this);
+    }
+    
+    void paint (Graphics& g) override
+    {
+        g.fillAll (Colours::transparentWhite);
+    }
+    
+    void resized() override
+    {
+        // make a list of two of our child components that we want to reposition
+        Component* comps[] = { &fileTree, &resizerBar, nullptr };
+        
+        // this will position the 3 components, one above the other, to fit
+        // vertically into the rectangle provided.
+        stretchableManager.layOutComponents (comps, 3,
+                                             0, 0, getWidth(), getHeight(),
+                                             true, true);
+        
+        // now position out two video components in the space that's left
+        //Rectangle<int> area (getLocalBounds().removeFromBottom (getHeight() - resizerBar.getBottom()));
+        
+        {
+
+        }
+
+    }
+    
+private:
+    WildcardFileFilter moviesWildcardFilter;
+    TimeSliceThread directoryThread;
+    DirectoryContentsList movieList;
+    FileTreeComponent fileTree;
+    StretchableLayoutManager stretchableManager;
+    StretchableLayoutResizerBar resizerBar;
+    FilterGraph* graph;
+    
+    void refresh() {
+        movieList.refresh();
+        fileTree.refresh();
+    }
+    
+    void buttonClicked (Button* button) override
+    {
+
+    }
+    
+    void selectionChanged() override
+    {
+        
+        if (graph != nullptr && graph->saveIfNeededAndUserAgrees() == FileBasedDocument::savedOk) {
+            graph->setLastDocumentOpened(fileTree.getSelectedFile().getFullPathName());
+            graph->loadFrom(fileTree.getSelectedFile().getFullPathName(), false);
+        }
+        
+    }
+    
+    
+    void fileClicked (const File&, const MouseEvent&) override {}
+    void fileDoubleClicked (const File&) override {}
+    void browserRootChanged (const File&) override {}
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetBrowser)
+};
+
+
+
+//==============================================================================
+/**
+ Template option tile button.
+ The drawable button object class for the tile icons and buttons in the TemplateTileBrowser
+ */
+class TemplateOptionButton   : public DrawableButton
+{
+public:
+    TemplateOptionButton (const String& buttonName, ButtonStyle buttonStyle, const char* thumbSvg)
+    : DrawableButton (buttonName, buttonStyle)
+    {
+        // svg for thumbnail icon
+        ScopedPointer<XmlElement> svg (XmlDocument::parse (thumbSvg));
+        jassert (svg != nullptr);
+        
+        thumb = Drawable::createFromSVG (*svg);
+        thumb->replaceColour(Colour (0xff448AFF), findColour(mainAccentColourId));
+        
+        // svg for thumbnail background highlight
+        ScopedPointer<XmlElement> backSvg (XmlDocument::parse (BinaryData::middle_highlight_svg));
+        jassert (backSvg != nullptr);
+        
+        hoverBackground = Drawable::createFromSVG (*backSvg);
+        hoverBackground->replaceColour(Colour (0xffDDDDDD), findColour(mainAccentColourId).withAlpha(0.3f));
+        
+        name = buttonName;
+        
+        description = "<insert description>";
+    }
+    
+    void paintButton (Graphics& g, bool isMouseOverButton, bool /*isButtonDown*/) override
+    {
+        const Rectangle<float> r (getLocalBounds().toFloat());
+
+        if (isMouseOverButton)
+        {
+            if (getStyle() == ImageFitted)
+            {
+                hoverBackground->drawWithin (g, r , RectanglePlacement::centred, 1.0);
+                thumb->drawWithin (g, r , RectanglePlacement::centred, 1.0);
+            }
+            else if (getStyle() == ImageAboveTextLabel)
+            {
+                g.setColour (findColour (mainAccentColourId).withAlpha (0.3f));
+                if (isConnectedOnLeft() || isConnectedOnRight()) {
+                    g.fillRoundedRectangle (r, 10.0f);
+                    g.setColour (findColour (mainAccentColourId));
+                    g.drawRoundedRectangle (r, 10.0f, 1.35f);
+                }
+                else {
+                    g.fillRect (r);
+                    g.setColour (findColour (mainAccentColourId));
+                    g.drawRect (r);
+                }
+                //hoverBackground->drawWithin (g, r , RectanglePlacement::centred, 1.0);
+                thumb->drawWithin (g, getLocalBounds().toFloat() , RectanglePlacement::centred, 1.0f);
+            }
+            else
+            {
+                g.setColour (findColour (mainAccentColourId).withAlpha (0.3f));
+                if (isConnectedOnLeft() || isConnectedOnRight()) {
+                    g.setColour (findColour (mainAccentColourId));
+                    g.drawRoundedRectangle (r, 10.0f, 1.35f);
+                }
+                else {
+                    g.setColour (findColour (mainAccentColourId));
+                    g.drawRect (r);
+                }
+            }
+        }
+        else
+        {
+            if (getStyle() == ImageFitted)
+            {
+                thumb->drawWithin (g, r, RectanglePlacement::centred, 1.0);
+            }
+            else if (getStyle() == ImageAboveTextLabel)
+            {
+                thumb->drawWithin (g, getLocalBounds().toFloat() , RectanglePlacement::centred, 1.0f);
+                //thumb->drawWithin (g, getLocalBounds().removeFromTop (100).reduced (10).toFloat() , RectanglePlacement::centred, 1.0f);
+                g.setColour (findColour (mainAccentColourId));
+                if (isConnectedOnLeft() || isConnectedOnRight()) {
+                    g.drawRoundedRectangle (r, 10.0f, 1.35f);
+                }
+                else {
+                    g.drawRect (r);
+                }
+            }
+            else
+            {
+                g.setColour (findColour (mainAccentColourId));
+                if (isConnectedOnLeft() || isConnectedOnRight()) {
+                    g.drawRoundedRectangle (r, 10.0f, 1.35f);
+                }
+                else {
+                    g.drawRect (r);
+                }
+            }
+        }
+        
+        Rectangle<float> textTarget;
+        g.setColour (findColour (mainBackgroundColourId).contrasting());
+        
+        // center the text for the text buttons or position the text in the image buttons
+        if (getStyle() != ImageFitted)
+        {
+            textTarget = getLocalBounds().toFloat();
+        }
+        else if (getStyle() == ImageAboveTextLabel)
+        {
+            textTarget = RectanglePlacement (RectanglePlacement::centred).appliedTo (thumb->getDrawableBounds(), r);
+            textTarget = textTarget.removeFromBottom (textTarget.getHeight() * 0.3f);
+        }
+        else
+        {
+            textTarget = RectanglePlacement (RectanglePlacement::centred).appliedTo (thumb->getDrawableBounds(), r);
+            textTarget = textTarget.removeFromBottom (textTarget.getHeight() * 0.3f);
+        }
+        
+        const int textH = (getStyle() == ImageAboveTextLabel)
+        ? jmin (16, getLocalBounds().proportionOfHeight (0.25f))
+        : 0;
+        
+        if (textH > 0)
+        {
+            g.setFont ((float) textH);
+            
+            g.setColour (findColour (getToggleState() ? DrawableButton::textColourOnId
+                                     : DrawableButton::textColourId)
+                         .withMultipliedAlpha (isEnabled() ? 1.0f : 0.4f));
+            
+            g.drawFittedText (name,
+                              2, getLocalBounds().getHeight() - textH - getLocalBounds().proportionOfHeight (0.25f),
+                              getLocalBounds().getWidth() - 4, textH,
+                              Justification::centred, 1);
+        }
+        else
+        {
+            g.drawText (name, textTarget, Justification::centred, true);
+        }
+        
+        
+        
+        
+    }
+    
+    void resized() override
+    {
+        thumb->setBoundsToFit (0, 0, getWidth(), getHeight(), Justification::centred, false);
+    }
+    
+    void setDescription (String descript) noexcept
+    {
+        description = descript;
+    }
+    
+    String getDescription() const noexcept
+    {
+        return description;
+    }
+    
+private:
+    ScopedPointer<Drawable> thumb, hoverBackground;
+    String name, description;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TemplateOptionButton)
+};
+
+        
+        
+
+//==============================================================================
+/**
+ Project Template Component for front page.
+ Features multiple icon buttons to select the type of project template
+ */
+class TemplateTileBrowser   : public Component,
+private ChangeListener,
+private ButtonListener
+
+{
+public:
+    TemplateTileBrowser (FilterGraph& graph_)
+    : graph(graph_)
+    {
+        presetBrowser = new FileListBoxComponent (graph);
+        addAndMakeVisible(presetBrowser);
+        graph.addChangeListener(this);
+
+    }
+    
+    ~TemplateTileBrowser()
+    {
+        graph.removeChangeListener (this);
+        pluginEditor = nullptr;
+        deleteAllChildren();
+    }
+    
+    void paint (Graphics& g) override
+    {
+        g.setColour (findColour (mainAccentColourId));
+        g.setFont (20.0f);
+        g.drawText ("Loading...", 0, 0, getWidth(), 200, Justification::centred, true);
+        
+    }
+    
+    void resized() override
+    {
+        Rectangle<int> allOpts = getLocalBounds();
+        allOpts.removeFromTop (200);
+        presetBrowser->setBounds(allOpts);
+        
+    }
+    
+    void showPlugin (const String& name)
+    {
+        for (int i = graph.getNumFilters(); --i >= 0;)
+        {
+            const AudioProcessorGraph::Node::Ptr f(graph.getNode(i));
+            if (f->getProcessor()->getName() == name) {
+                if (PluginWindow* const w = PluginWindow::getWindowFor(f, PluginWindow::Normal, graph.getGraph()))
+                    w->toFront(true);
+            }
+            
+        }
+    }
+    
+    PluginEditor* getPluginEditor (const String& name)
+    {
+        
+        for (int i = graph.getNumFilters(); --i >= 0;)
+        {
+            const AudioProcessorGraph::Node::Ptr f(graph.getNode(i));
+            if (f->getProcessor()->getName() == name)
+                if (PluginEditor* const w = PluginEditor::getPluginEditorFor(f, PluginEditor::Normal, graph.getGraph()))
+                    return w;
+        }
+        return nullptr;
+    }
+    
+    
+    
+private:
+    OwnedArray<TemplateOptionButton> optionButtons;
+    //ScopedPointer<TemplateOptionButton> audioSettingsButton, openProjectButton, saveProjectButton;
+    ApplicationCommandManager commandManager;
+    ScopedPointer<MainHostWindow> mainWindow;
+    FilterGraph& graph;
+    ScopedPointer<PluginEditor> pluginEditor;
+    FileListBoxComponent* presetBrowser;
+    
+    void changeListenerCallback	(ChangeBroadcaster* source) override
+    {
+        pluginEditor = getPluginEditor("Recorder");
+        addAndMakeVisible(pluginEditor);
+        
+    }
+    
+    void buttonClicked (Button* button) override
+    {
+
+        
+    }
+
+    
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TemplateTileBrowser)
+};
+        
+
+     
 //==============================================================================
 GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& formatManager,
                                                 AudioDeviceManager* deviceManager_)
     : graph (new FilterGraph (formatManager)), deviceManager (deviceManager_),
       graphPlayer (getAppProperties().getUserSettings()->getBoolValue ("doublePrecisionProcessing", false))
 {
+    graphPanel = new GraphEditorPanel (*graph);
     addAndMakeVisible(panel = new SlidingPanelComponent());
     TemplateTileBrowser* menu;
     panel->addTab ("Menu", menu = new TemplateTileBrowser (*graph), true);
-    panel->addTab ("Edit Preset", graphPanel = new GraphEditorPanel (*graph), true);
-    
+    //panel->addTab ("Graph", graphPanel, true);
     
     deviceManager->addChangeListener (graphPanel);
 
@@ -1459,7 +1816,7 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
     keyState.addListener (&graphPlayer.getMidiMessageCollector());
 
     addAndMakeVisible (keyboardComp = new CustomMidiKeyboardComponent (keyState, CustomMidiKeyboardComponent::Orientation::horizontalKeyboard));
-
+    
     addAndMakeVisible (statusBar = new TooltipBar());
 
     deviceManager->addAudioCallback (&graphPlayer);
@@ -1469,6 +1826,8 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
     
 	keyboardFocusTransferer = new KeyboardFocusTransferer();
 	keyboardFocusTransferer->setCallback(this, keyboardComp);
+    
+    addMouseListener(this, true);
 }
 
 GraphDocumentComponent::~GraphDocumentComponent()
@@ -1476,6 +1835,7 @@ GraphDocumentComponent::~GraphDocumentComponent()
     releaseGraph();
     keyState.removeListener (&graphPlayer.getMidiMessageCollector());
     keyboardFocusTransferer->~KeyboardFocusTransferer();
+
 }
 
 void GraphDocumentComponent::resized()
@@ -1486,6 +1846,7 @@ void GraphDocumentComponent::resized()
     panel->setBounds (0, 0, getWidth(), getHeight() - keysHeight);
     statusBar->setBounds (0, getHeight() - keysHeight - statusHeight, getWidth(), statusHeight);
     keyboardComp->setBounds (0, getHeight() - keysHeight, getWidth(), keysHeight);
+    //transComp->setBounds (0, getHeight() - keysHeight, getWidth(), keysHeight);
 }
 
 void GraphDocumentComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
@@ -1514,3 +1875,9 @@ void GraphDocumentComponent::paint (Graphics& g)
 {
     g.fillAll(findColour (mainBackgroundColourId));
 }
+        
+void GraphDocumentComponent::mouseDown(const MouseEvent &event)
+{
+    DBG(event.originalComponent->getName());
+}
+        

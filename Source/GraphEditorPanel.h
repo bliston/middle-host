@@ -131,12 +131,13 @@ public:
     //==============================================================================
     void createNewPlugin (const PluginDescription* desc, int x, int y);
     inline void setDoublePrecision (bool doublePrecision) { graphPlayer.setDoublePrecisionProcessing (doublePrecision); }
+    //PluginEditor*  getPluginEditor (const String& name);
 
     //==============================================================================
     ScopedPointer<FilterGraph> graph;
 
     //==============================================================================
-    void resized();
+    void resized() override;
 
     //==============================================================================
     void unfocusKeyboardComponent();
@@ -145,7 +146,9 @@ public:
     void releaseGraph();
     
     //==============================================================================
-    void paint (Graphics& g);
+    void paint (Graphics& g) override;
+    
+    void mouseDown(const MouseEvent &event) override;
     
 
 private:
@@ -163,6 +166,7 @@ private:
     Component* keyboardComp;
     Component* statusBar;
     KeyboardFocusTransferer* keyboardFocusTransferer;
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphDocumentComponent)
 };
@@ -204,6 +208,43 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginWindow)
 };
 
+//==============================================================================
+/** A desktop window containing a plugin's UI. */
+class PluginEditor  : public Component
+{
+public:
+    enum WindowFormatType
+    {
+        Normal = 0,
+        Generic,
+        Programs,
+        Parameters,
+        AudioIO,
+        NumTypes
+    };
+    
+    PluginEditor (Component* pluginEditor, AudioProcessorGraph::Node*, WindowFormatType, AudioProcessorGraph&);
+    ~PluginEditor();
+    
+    static PluginEditor* getPluginEditorFor (AudioProcessorGraph::Node*, WindowFormatType, AudioProcessorGraph&);
+    
+    static void closePluginEditorsFor (const uint32 nodeId);
+    static void closeAllPluginEditors();
+    void clearContentComponent();
+    static void* deleteComponent (void* userData);
+    static void closeProcessor (AudioProcessor* processor);
+    void resized() override;
+    
+private:
+    AudioProcessorGraph& graph;
+    AudioProcessorGraph::Node* owner;
+    WindowFormatType type;
+    
+    float getDesktopScaleFactor() const override     { return 1.0f; }
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
+};
+
 inline String toString (PluginWindow::WindowFormatType type)
 {
     switch (type)
@@ -212,6 +253,18 @@ inline String toString (PluginWindow::WindowFormatType type)
         case PluginWindow::Generic:    return "Generic";
         case PluginWindow::Programs:   return "Programs";
         case PluginWindow::Parameters: return "Parameters";
+        default:                       return String();
+    }
+}
+
+inline String toString (PluginEditor::WindowFormatType type)
+{
+    switch (type)
+    {
+        case PluginEditor::Normal:     return "Normal";
+        case PluginEditor::Generic:    return "Generic";
+        case PluginEditor::Programs:   return "Programs";
+        case PluginEditor::Parameters: return "Parameters";
         default:                       return String();
     }
 }

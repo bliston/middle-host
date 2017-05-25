@@ -31,11 +31,13 @@ struct SlidingPanelComponent::DotButton  : public Button
     {
         g.setColour (findColour (mainBackgroundColourId).contrasting());
         const Rectangle<float> r (getLocalBounds().reduced (getWidth() / 4).toFloat());
+        if (owner.getNumTabs() > 1) {
+            if (index == owner.getCurrentTabIndex())
+                g.fillEllipse (r);
+            else
+                g.drawEllipse (r, 1.0f);
+        }
 
-        if (index == owner.getCurrentTabIndex())
-            g.fillEllipse (r);
-        else
-            g.drawEllipse (r, 1.0f);
     }
 
     void clicked() override
@@ -73,6 +75,8 @@ void SlidingPanelComponent::addTab (const String& tabName,
     pages.insert (insertIndex, page);
     page->content = contentComponent;
     addAndMakeVisible (page->dotButton = new DotButton (*this, pages.indexOf (page)));
+    
+    
     page->name = tabName;
     page->shouldDelete = deleteComponentWhenNotNeeded;
 
@@ -98,12 +102,14 @@ void SlidingPanelComponent::resized()
 
     Rectangle<int> content (getLocalBounds());
 
-    Rectangle<int> dotHolder = content.removeFromBottom (20 + dotSize)
+ 
+    Rectangle<int> dotHolder;
+        dotHolder = content.removeFromBottom (20 + dotSize)
                                  .reduced ((content.getWidth() - dotSize * getNumTabs()) / 2, 10);
 
-    for (int i = 0; i < getNumTabs(); ++i)
+    for (int i = 0; i < getNumTabs(); ++i) {
         pages.getUnchecked(i)->dotButton->setBounds (dotHolder.removeFromLeft (dotSize));
-
+    }
     for (int i = pages.size(); --i >= 0;)
         if (Component* c = pages.getUnchecked(i)->content)
             c->setBounds (content.translated (i * content.getWidth(), 0));

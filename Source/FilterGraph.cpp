@@ -52,7 +52,7 @@ FilterGraph::FilterGraph (AudioPluginFormatManager& formatManager_)
 
 FilterGraph::~FilterGraph()
 {
-    graph.addListener (this);
+    graph.removeListener (this);
     graph.clear();
 }
 
@@ -125,6 +125,8 @@ void FilterGraph::addFilterCallback (AudioPluginInstance* instance, const String
 
 void FilterGraph::removeFilter (const uint32 id)
 {
+    
+    PluginEditor::closePluginEditorsFor(id);
     PluginWindow::closeCurrentlyOpenWindowsFor (id);
 
     if (graph.removeNode (id))
@@ -214,6 +216,7 @@ void FilterGraph::removeConnection (uint32 sourceFilterUID, int sourceFilterChan
 
 void FilterGraph::clear()
 {
+    PluginEditor::closeAllPluginEditors();
     PluginWindow::closeAllCurrentlyOpenWindows();
 
     graph.clear();

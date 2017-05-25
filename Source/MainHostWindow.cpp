@@ -73,7 +73,7 @@ private:
 //==============================================================================
 MainHostWindow::MainHostWindow()
     : DocumentWindow (JUCEApplication::getInstance()->getApplicationName(), Colours::lightgrey,
-                      DocumentWindow::allButtons)
+                      DocumentWindow::minimiseButton|DocumentWindow::closeButton)
 {
     formatManager.addDefaultFormats();
     formatManager.addFormat (new InternalPluginFormat());
@@ -83,13 +83,14 @@ MainHostWindow::MainHostWindow()
 
     deviceManager.initialise (256, 256, savedAudioState, true);
 
-    setResizable (true, false);
-    setResizeLimits (500, 400, 10000, 10000);
-    centreWithSize (800, 600);
+    setResizable (false, false);
+    //setResizeLimits (500, 400, 10000, 10000);
+    //centreWithSize (500, 400);
+    setSize(500, 500);
 
     setContentOwned (new GraphDocumentComponent (formatManager, &deviceManager), false);
 
-    restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
+    //restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
 
     setVisible (true);
 

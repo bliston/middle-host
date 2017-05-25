@@ -46,8 +46,10 @@ public:
 	CustomLookAndFeel()
 	{
 
-		const Colour accentColour(0xff2196F3);
+		//const Colour accentColour(0xff2196F3);
+        const Colour accentColour(Colours::skyblue);
 		setColour(mainAccentColourId, accentColour);
+        setColour(lightAccentColourId, Colour(0xffFAFAFA));
 		setColour(mainBackgroundColourId, Colours::white);
 		LookAndFeel::setDefaultSansSerifTypefaceName("Quicksand");
 		setColour(TextButton::textColourOnId, accentColour);
@@ -75,6 +77,8 @@ public:
 		setColour(ComboBox::arrowColourId, accentColour);
 		setColour(PopupMenu::highlightedBackgroundColourId, accentColour.withAlpha(0.2f));
 		setColour(PopupMenu::highlightedTextColourId, accentColour.withAlpha(0.2f).contrasting());
+
+        
 		//setColour(ComboBox::backgroundColourId, accentColour);
 		//setColour(ComboBox::buttonColourId, accentColour);
 	}

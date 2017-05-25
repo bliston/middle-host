@@ -22,6 +22,7 @@ enum ColourIds
 {
     mainBackgroundColourId          = 0x2340000,
     mainAccentColourId              = 0x2345000,
+    lightAccentColourId             = 0x2345600,
 };
 
 #endif   // APPCOLOURS_H_INCLUDED
