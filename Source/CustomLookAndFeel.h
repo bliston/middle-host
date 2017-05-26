@@ -46,8 +46,8 @@ public:
 	CustomLookAndFeel()
 	{
 
-		//const Colour accentColour(0xff2196F3);
-        const Colour accentColour(Colours::skyblue);
+		const Colour accentColour(0xff2196F3);
+        //const Colour accentColour(Colours::skyblue);
 		setColour(mainAccentColourId, accentColour);
         setColour(lightAccentColourId, Colour(0xffFAFAFA));
 		setColour(mainBackgroundColourId, Colours::white);

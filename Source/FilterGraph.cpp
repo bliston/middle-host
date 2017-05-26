@@ -261,11 +261,16 @@ Result FilterGraph::loadDocument (const File& file)
 
 Result FilterGraph::saveDocument (const File& file)
 {
+	if (!file.hasWriteAccess())
+	{
+		return Result::fail("This is a template project. To save your own copy of this project, choose 'Save As'. Any recording will be saved as well.");
+	}
     ScopedPointer<XmlElement> xml (createXml());
 
-    if (! xml->writeToFile (file, String()))
-        return Result::fail ("Couldn't write to the file");
-
+	if (!xml->writeToFile(file, String()))
+	{
+		return Result::fail("Couldn't write to the file");
+	}
     return Result::ok();
 }
 

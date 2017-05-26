@@ -332,7 +332,7 @@ PluginWindow* PluginWindow::getWindowFor (AudioProcessorGraph::Node* const node,
     {
         if (AudioPluginInstance* const plugin = dynamic_cast<AudioPluginInstance*> (processor))
             ui->setName (plugin->getName());
-
+		if (ui->getName() != "Recorder")
         return new PluginWindow (ui, node, type, audioGraph);
     }
 
@@ -1277,7 +1277,7 @@ public:
             const String& message = midiMessageList.getReference (row);
             
             if (rowIsSelected) {
-                if (row == midiMessageList.indexOf(graph.getLastDocumentOpened().getFileNameWithoutExtension()))
+                //if (row == midiMessageList.indexOf(graph.getLastDocumentOpened().getFileNameWithoutExtension()))
                 g.fillAll (Colours::skyblue.withAlpha (0.3f));
             }
 
@@ -1294,7 +1294,7 @@ public:
         if (isPositiveAndBelow (row, midiMessageList.size()))
         {
             String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
-            String folder = documentsFolder + "/Middle/Projects/Presets/";
+            String folder = documentsFolder + "/Middle/Projects/";
             const String& message = midiMessageList.getReference (row);
             graph.loadFrom(File(folder + message + ".middle"), true);
         }
@@ -1322,7 +1322,7 @@ public:
     {
         setOpaque (false);
         addAndMakeVisible(titleLabel);
-        titleLabel.setText("Song Presets", dontSendNotification);
+        titleLabel.setText("Template Projects", dontSendNotification);
         titleLabel.setColour(Label::textColourId, findColour(mainAccentColourId));
         titleLabel.setJustificationType(Justification::centred);
         addAndMakeVisible (messageListBox);
@@ -1365,11 +1365,12 @@ public:
         clearMessagesFromList();
         String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
         String folder = documentsFolder + "/Middle/Projects";
-        DirectoryIterator iter (File (folder), true, "*.middle*");
+        DirectoryIterator iter (File (folder), false, "*.middle*");
         
         while (iter.next())
         {
             File theFileItFound (iter.getFile());
+			if (!theFileItFound.hasWriteAccess())
             addMessageToList (theFileItFound.getFileNameWithoutExtension());
         }
         
@@ -1378,8 +1379,9 @@ public:
     
     void selectOpenedListItem() {
         int indexOfDocumentTitle;
-        indexOfDocumentTitle = midiMessageList.indexOf(graph.getLastDocumentOpened().getFileName());
+        indexOfDocumentTitle = midiMessageList.indexOf(graph.getLastDocumentOpened().getFileNameWithoutExtension());
         messageListBox.selectRow(indexOfDocumentTitle);
+		messageListBox.repaint();
     }
     
     void addMessageToList (const String& message)
@@ -1433,7 +1435,7 @@ public:
     {
         setOpaque (false);
         String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
-        String folder = documentsFolder + "/Middle/Projects/Presets";
+        String folder = documentsFolder + "/Middle/Projects";
         movieList.setDirectory (File(folder), true, true);
         directoryThread.startThread (1);
         
@@ -1728,9 +1730,28 @@ public:
     {
         g.setColour (findColour (mainAccentColourId));
         g.setFont (20.0f);
-        g.drawText ("Loading...", 0, 0, getWidth(), 200, Justification::centred, true);
+		if (projectHasPlugin("Recorder")) {
+			g.drawText("Loading...", 0, 0, getWidth(), 200, Justification::centred, true);
+		}
+		else {
+			g.drawText("No Recorder", 0, 0, getWidth(), 200, Justification::centred, true);
+		}
+        
         
     }
+
+	bool projectHasPlugin(const String& pluginName) {
+		bool hasPlugin = false;
+		for (int i = graph.getNumFilters(); --i >= 0;)
+		{
+			const AudioProcessorGraph::Node::Ptr f(graph.getNode(i));
+			if (f->getProcessor()->getName() == pluginName) {
+					hasPlugin = true;
+			}
+
+		}
+		return hasPlugin;
+	}
     
     void resized() override
     {
@@ -1755,7 +1776,6 @@ public:
     
     PluginEditor* getPluginEditor (const String& name)
     {
-        
         for (int i = graph.getNumFilters(); --i >= 0;)
         {
             const AudioProcessorGraph::Node::Ptr f(graph.getNode(i));
@@ -1779,6 +1799,7 @@ private:
     
     void changeListenerCallback	(ChangeBroadcaster* source) override
     {
+		repaint();
         pluginEditor = getPluginEditor("Recorder");
         addAndMakeVisible(pluginEditor);
         
@@ -1807,7 +1828,7 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
     addAndMakeVisible(panel = new SlidingPanelComponent());
     TemplateTileBrowser* menu;
     panel->addTab ("Menu", menu = new TemplateTileBrowser (*graph), true);
-    //panel->addTab ("Graph", graphPanel, true);
+    panel->addTab ("Graph", graphPanel, true);
     
     deviceManager->addChangeListener (graphPanel);
 

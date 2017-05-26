@@ -83,17 +83,15 @@ MainHostWindow::MainHostWindow()
 
     deviceManager.initialise (256, 256, savedAudioState, true);
 
-    setResizable (false, false);
-    //setResizeLimits (500, 400, 10000, 10000);
-    //centreWithSize (500, 400);
-    setSize(500, 500);
+    setResizable (true, true);
+    setResizeLimits (500, 400, 10000, 10000);
+    centreWithSize (500, 500);
 
     setContentOwned (new GraphDocumentComponent (formatManager, &deviceManager), false);
 
-    //restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
+    restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
 
     setVisible (true);
-
     InternalPluginFormat internalFormat;
     internalFormat.getAllTypes (internalTypes);
 
