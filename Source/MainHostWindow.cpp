@@ -33,7 +33,7 @@ class MainHostWindow::PluginListWindow  : public DocumentWindow
 public:
     PluginListWindow (MainHostWindow& owner_, AudioPluginFormatManager& pluginFormatManager)
         : DocumentWindow ("Available Plugins", Colours::white,
-                          DocumentWindow::minimiseButton | DocumentWindow::closeButton),
+                          DocumentWindow::allButtons),
           owner (owner_)
     {
         const File deadMansPedalFile (getAppProperties().getUserSettings()
@@ -43,10 +43,10 @@ public:
                                                   owner.knownPluginList,
                                                   deadMansPedalFile,
                                                   getAppProperties().getUserSettings(), true), true);
-
-        setResizable (true, false);
+        setResizable (true, true);
         setResizeLimits (300, 400, 800, 1500);
         setTopLeftPosition (60, 60);
+        
 
         restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("listWindowPos"));
         setVisible (true);
@@ -83,13 +83,14 @@ MainHostWindow::MainHostWindow()
 
     deviceManager.initialise (256, 256, savedAudioState, true);
 
-    setResizable (true, true);
-    setResizeLimits (500, 400, 10000, 10000);
+    setFullScreen(false);
+    setResizable (false, false);
+    //setResizeLimits (500, 400, 10000, 10000);
     centreWithSize (500, 500);
 
     setContentOwned (new GraphDocumentComponent (formatManager, &deviceManager), false);
 
-    restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
+    //restoreWindowStateFromString (getAppProperties().getUserSettings()->getValue ("mainWindowPos"));
 
     setVisible (true);
     InternalPluginFormat internalFormat;
