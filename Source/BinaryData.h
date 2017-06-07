@@ -175,6 +175,8 @@ namespace BinaryData
     extern const char* middle_synth_instrument_svg;
     const int          middle_synth_instrument_svgSize = 9994;
     
+    extern const char* quicksand_regular_ttf;
+    const int          quicksand_regular_ttf_Size = 23824;
     
 
     // Points to the start of a list of resource names.

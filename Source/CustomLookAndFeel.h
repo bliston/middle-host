@@ -45,13 +45,12 @@ class CustomLookAndFeel : public LookAndFeel_V3
 public:
 	CustomLookAndFeel()
 	{
-
+        typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
 		const Colour accentColour(0xff2196F3);
         //const Colour accentColour(Colours::skyblue);
 		setColour(mainAccentColourId, accentColour);
         setColour(lightAccentColourId, Colour(0xffFAFAFA));
 		setColour(mainBackgroundColourId, Colours::white);
-		LookAndFeel::setDefaultSansSerifTypefaceName("Quicksand");
 		setColour(TextButton::textColourOnId, accentColour);
 		setColour(TextButton::buttonColourId, findColour(mainBackgroundColourId));
 		setColour(AlertWindow::backgroundColourId, findColour(mainBackgroundColourId));
@@ -82,6 +81,13 @@ public:
 		//setColour(ComboBox::backgroundColourId, accentColour);
 		//setColour(ComboBox::buttonColourId, accentColour);
 	}
+    
+    Typeface::Ptr getTypefaceForFont (const Font& font) override
+    {
+
+        return typeface;
+
+    }
 
 	static void drawButtonShape(Graphics& g, const Path& outline, Colour baseColour, float height)
 	{
@@ -770,6 +776,8 @@ public:
 private:
 	Image backgroundTexture;
 	Colour backgroundTextureBaseColour;
+    ReferenceCountedObjectPtr<Typeface> typeface;
+
 };
 
 
