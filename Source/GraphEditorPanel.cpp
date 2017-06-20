@@ -36,7 +36,7 @@ PluginWindow::PluginWindow (Component* const pluginEditor,
                             AudioProcessorGraph::Node* const o,
                             WindowFormatType t,
                             AudioProcessorGraph& audioGraph)
-    : DocumentWindow (pluginEditor->getName(), Colours::lightblue,
+    : DocumentWindow (pluginEditor->getName(), Colours::white,
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton),
       graph (audioGraph),
       owner (o),
@@ -467,8 +467,9 @@ public:
           numIns (0),
           numOuts (0)
     {
+
         shadow.setShadowProperties (DropShadow (Colours::lightgrey, 3, Point<int> (0, 1)));
-        //setComponentEffect (&shadow);
+        setComponentEffect (&shadow);
 
         setSize (150, 60);
     }
@@ -585,7 +586,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (findColour (mainBackgroundColourId));
+        g.setColour (findColour (mainAccentColourId).withAlpha(0.7f));
 
         const int x = 4;
         const int y = pinSize;
@@ -594,8 +595,11 @@ public:
 
         g.fillRoundedRectangle (x, y, w, h, 10);
 
-        g.setColour (findColour (mainBackgroundColourId).contrasting());
-        g.setFont (font);
+        g.setColour (Colours::white);
+        typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+        Font fontCustom(typeface);
+        fontCustom.setHeight(13.0f);
+        g.setFont (fontCustom);
         g.drawFittedText (getName(), getLocalBounds().reduced (4, 2), Justification::centred, 2);
 
         g.setColour (findColour (mainAccentColourId));
@@ -717,6 +721,7 @@ public:
 private:
     int pinSize;
     Point<int> originalPos;
+    ReferenceCountedObjectPtr<Typeface> typeface;
     Font font;
     int numIns, numOuts;
     DropShadowEffect shadow;
@@ -1282,6 +1287,8 @@ public:
             }
 
             g.setColour (Colours::black);
+            typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+            g.setFont(typeface);
             
             g.drawText (message,
                         Rectangle<int> (width, height).reduced (4, 0),
@@ -1306,6 +1313,7 @@ public:
 private:
     const Array<String>& midiMessageList;
     FilterGraph& graph;
+    ReferenceCountedObjectPtr<Typeface> typeface;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileListBoxModel)
 };
@@ -1342,15 +1350,6 @@ public:
     void paint (Graphics& g) override
     {
         g.fillAll (Colours::transparentWhite);
-        
-        ScopedPointer<Drawable> logoBackground;
-        // svg for thumbnail background highlight
-        ScopedPointer<XmlElement> backSvg (XmlDocument::parse (BinaryData::middle_therapeutic_logo_svg));
-        jassert (backSvg != nullptr);
-        
-//        logoBackground = Drawable::createFromSVG (*backSvg);
-//        logoBackground->replaceColour(Colours::white, findColour(mainAccentColourId));
-//        logoBackground->drawWithin (g, getLocalBounds().removeFromBottom (250).reduced (80).toFloat() , RectanglePlacement::centred, 1.0f);
     }
     
     void resized() override
@@ -1426,8 +1425,8 @@ private FileBrowserListener
 {
 public:
     PresetBrowser(FilterGraph* graph_)
-    : moviesWildcardFilter ("*.middlet", "*.middlet", "Movies File Filter"),
-    directoryThread ("Movie File Scanner Thread"),
+    : moviesWildcardFilter ("*.middlet", "*.middlet", "File Filter"),
+    directoryThread ("File Scanner Thread"),
     movieList (&moviesWildcardFilter, directoryThread),
     fileTree (movieList),
     resizerBar (&stretchableManager, 1, false),
@@ -1728,8 +1727,13 @@ public:
     
     void paint (Graphics& g) override
     {
-        g.setColour (findColour (mainAccentColourId));
-        g.setFont (20.0f);
+        g.setColour (Colours::lightgrey);
+        ReferenceCountedObjectPtr<Typeface> typeface;
+        typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+        Font font(typeface);
+        font.setHeight(20.0f);
+        g.setFont(font);
+        
 		if (projectHasPlugin("Recorder")) {
 			g.drawText("Loading...", 0, 0, getWidth(), 200, Justification::centred, true);
 		}

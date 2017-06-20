@@ -85,8 +85,6 @@
     <FILE id="MwOpL6" name="AppColours.h" compile="0" resource="0" file="Source/AppColours.h"/>
     <FILE id="vpNdtl" name="BinaryData.cpp" compile="1" resource="0" file="Source/BinaryData.cpp"/>
     <FILE id="fqIzEM" name="BinaryData.h" compile="0" resource="0" file="Source/BinaryData.h"/>
-    <FILE id="jSU0zz" name="CustomLookAndFeel.h" compile="0" resource="0"
-          file="Source/CustomLookAndFeel.h"/>
     <FILE id="UAWMnb" name="CustomMidiKeyboardComponent.cpp" compile="1"
           resource="0" file="Source/CustomMidiKeyboardComponent.cpp"/>
     <FILE id="DGepwY" name="CustomMidiKeyboardComponent.h" compile="0"
@@ -116,6 +114,8 @@
           file="Source/SlidingPanelComponent.h"/>
     <FILE id="AkkkFP" name="StartPageComponent.h" compile="0" resource="0"
           file="Source/StartPageComponent.h"/>
+    <FILE id="ZFtCEw" name="MiddleLookAndFeel.h" compile="1" resource="0"
+          file="Source/MiddleLookAndFeel.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_WASAPI="enabled" JUCE_DIRECTSOUND="enabled" JUCE_ALSA="enabled"
                JUCE_QUICKTIME="disabled" JUCE_USE_FLAC="disabled" JUCE_USE_OGGVORBIS="enabled"

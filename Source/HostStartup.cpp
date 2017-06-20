@@ -25,7 +25,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainHostWindow.h"
 #include "InternalFilters.h"
-#include "CustomLookAndFeel.h"
+#include "MiddleLookAndFeel.h"
 
 #if ! (JUCE_PLUGINHOST_VST || JUCE_PLUGINHOST_VST3 || JUCE_PLUGINHOST_AU)
  #error "If you're building the audio plugin host, you probably want to enable VST and/or AU support"
@@ -123,7 +123,7 @@ public:
 
     ApplicationCommandManager commandManager;
     ScopedPointer<ApplicationProperties> appProperties;
-    CustomLookAndFeel lookAndFeel;
+    MiddleLookAndFeel lookAndFeel;
 
 private:
     ScopedPointer<MainHostWindow> mainWindow;

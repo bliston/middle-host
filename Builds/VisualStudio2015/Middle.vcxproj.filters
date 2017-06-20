@@ -2130,9 +2130,6 @@
     <ClInclude Include="..\..\Source\BinaryData.h">
       <Filter>Middle</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\CustomLookAndFeel.h">
-      <Filter>Middle</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\CustomMidiKeyboardComponent.h">
       <Filter>Middle</Filter>
     </ClInclude>
@@ -2155,6 +2152,9 @@
       <Filter>Middle</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\StartPageComponent.h">
+      <Filter>Middle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MiddleLookAndFeel.h">
       <Filter>Middle</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h">

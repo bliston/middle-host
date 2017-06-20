@@ -1724,7 +1724,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\AppColours.h"/>
     <ClInclude Include="..\..\Source\BinaryData.h"/>
-    <ClInclude Include="..\..\Source\CustomLookAndFeel.h"/>
     <ClInclude Include="..\..\Source\CustomMidiKeyboardComponent.h"/>
     <ClInclude Include="..\..\Source\FilterGraph.h"/>
     <ClInclude Include="..\..\Source\FilterIOConfiguration.h"/>
@@ -1733,6 +1732,7 @@
     <ClInclude Include="..\..\Source\MainHostWindow.h"/>
     <ClInclude Include="..\..\Source\SlidingPanelComponent.h"/>
     <ClInclude Include="..\..\Source\StartPageComponent.h"/>
+    <ClInclude Include="..\..\Source\MiddleLookAndFeel.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioDataConverters.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioSampleBuffer.h"/>

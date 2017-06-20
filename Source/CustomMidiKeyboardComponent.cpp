@@ -466,7 +466,7 @@ void CustomMidiKeyboardComponent::paint(Graphics& g)
 
 		switch (orientation)
 		{
-		case horizontalKeyboard:            g.fillRect(0, 0, x, 5); break;
+		case horizontalKeyboard:            g.fillRect(0, 0, x, 1); break;
 		case verticalKeyboardFacingLeft:    g.fillRect(width - 5, 0, 5, x); break;
 		case verticalKeyboardFacingRight:   g.fillRect(0, 0, 5, x); break;
 		default: break;
@@ -527,7 +527,12 @@ void CustomMidiKeyboardComponent::drawWhiteNote(int midiNoteNumber,
 		const float fontHeight = jmin(12.0f, keyWidth * 0.9f);
 
 		g.setColour(textColour);
-		g.setFont(Font(fontHeight).withHorizontalScale(0.8f));
+        
+        ReferenceCountedObjectPtr<Typeface> typeface;
+        typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+        Font font(typeface);
+        font.setHeight(fontHeight);
+		g.setFont(font.withHorizontalScale(0.8f));
 
 		switch (orientation)
 		{
@@ -583,7 +588,7 @@ void CustomMidiKeyboardComponent::drawBlackNote(int /*midiNoteNumber*/,
 	}
 	else
 	{
-		g.setColour(c.brighter());
+		//g.setColour(c.brighter());
 		const int xIndent = jmax(1, jmin(w, h) / 8);
 
 		switch (orientation)
@@ -621,25 +626,28 @@ void CustomMidiKeyboardComponent::drawUpDownButton(Graphics& g, int w, int h,
 
 	switch (orientation)
 	{
-	case horizontalKeyboard:            angle = movesOctavesUp ? 0.67f : 0.17f;  break;
+	case horizontalKeyboard:            angle = movesOctavesUp ? 0.5f : 0.0f;  break;
 	case verticalKeyboardFacingLeft:    angle = movesOctavesUp ? 0.25f : 0.75f; break;
 	case verticalKeyboardFacingRight:   angle = movesOctavesUp ? 0.75f : 0.25f; break;
 	default:                            jassertfalse; angle = 0; break;
 	}
 
-	Path path;
-	//path.addTriangle (0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
-	path.startNewSubPath(0.0f, 0.0f);
-	path.lineTo(0.0f, 1.0f);
-	path.lineTo(1.0f, 0.5f);
+//	Path path;
+//	//path.addTriangle (0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
+//	path.startNewSubPath(0.0f, 0.0f);
+//	path.lineTo(0.0f, 1.0f);
+//	path.lineTo(1.0f, 0.5f);
+    
+    Path path(MiddleLookAndFeel().getPathFromChar(0xE314));
 
 	path.applyTransform(AffineTransform::rotation(float_Pi * 2.0f * angle, 0.5f, 0.5f));
 
 	g.setColour(findColour(upDownButtonArrowColourId)
 		.withAlpha(buttonDown ? 1.0f : (mouseOver ? 0.8f : 0.6f)));
 
-	//g.fillPath (path, path.getTransformToScaleToFit (1.0f, 1.0f, w - 2.0f, h - 2.0f, true));
-	g.strokePath(path, PathStrokeType(1.35f), path.getTransformToScaleToFit(1.0f, 1.0f, w - 3.0f, h - 3.0f, true));
+	g.fillPath (path, path.getTransformToScaleToFit (1.0f, 1.0f, w - 2.0f, h - 2.0f, true));
+    
+	//g.strokePath(path, PathStrokeType(1.35f), path.getTransformToScaleToFit(1.0f, 1.0f, w - 3.0f, h - 3.0f, true));
 }
 
 void CustomMidiKeyboardComponent::setBlackNoteLengthProportion(float ratio) noexcept
