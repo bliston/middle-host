@@ -1296,7 +1296,7 @@ public:
             String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
             String folder = documentsFolder + "/Middle/Projects/";
             const String& message = midiMessageList.getReference (row);
-            graph.loadFrom(File(folder + message + ".middle"), true);
+            graph.loadFrom(File(folder + message + ".middlet"), true);
         }
         
     }
@@ -1365,7 +1365,7 @@ public:
         clearMessagesFromList();
         String documentsFolder = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
         String folder = documentsFolder + "/Middle/Projects";
-        DirectoryIterator iter (File (folder), false, "*.middle*");
+        DirectoryIterator iter (File (folder), false, "*.middlet");
         
         while (iter.next())
         {
@@ -1426,7 +1426,7 @@ private FileBrowserListener
 {
 public:
     PresetBrowser(FilterGraph* graph_)
-    : moviesWildcardFilter ("*.middle", "*.middle", "Movies File Filter"),
+    : moviesWildcardFilter ("*.middlet", "*.middlet", "Movies File Filter"),
     directoryThread ("Movie File Scanner Thread"),
     movieList (&moviesWildcardFilter, directoryThread),
     fileTree (movieList),

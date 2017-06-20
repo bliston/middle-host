@@ -30,7 +30,7 @@ class FilterInGraph;
 class FilterGraph;
 
 const char* const filenameSuffix = ".middle";
-const char* const filenameWildcard = "*.middle";
+const char* const filenameWildcard = "*.middle*";
 
 //==============================================================================
 /**
