@@ -495,13 +495,13 @@ bool MainHostWindow::perform (const InvocationInfo& info)
 
 void MainHostWindow::showAudioSettings()
 {
-    AudioDeviceSelectorComponent audioSettingsComp (deviceManager,
+    CustomAudioDeviceSelectorComponent audioSettingsComp (deviceManager,
                                                     0, 256,
                                                     0, 256,
-                                                    true, true, true, false);
+                                                    true, true, true, true);
 
     audioSettingsComp.setSize (500, 450);
-
+    audioSettingsComp.setItemHeight(32);
     DialogWindow::LaunchOptions o;
     o.content.setNonOwned (&audioSettingsComp);
     o.dialogTitle                   = "Audio Settings";

@@ -1234,7 +1234,11 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setFont (Font (getHeight() * 0.7f));
+        ReferenceCountedObjectPtr<Typeface> typeface;
+        typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+        Font font(typeface);
+        font.setHeight(getHeight() * 0.7f);
+        g.setFont(font);
         g.setColour (findColour (mainBackgroundColourId).contrasting().withAlpha(0.7f));
         g.drawFittedText (tip, 0, 0, getWidth(), getHeight(), Justification::centred, 1);
     }
@@ -1265,12 +1269,13 @@ private:
 
         
 /** Simple list box that just displays a StringArray. */
-class FileListBoxModel   : public ListBoxModel
+class FileListBoxModel   : public Component, public ListBoxModel
 {
 public:
     FileListBoxModel (const Array<String>& list, FilterGraph& graph_)
     : midiMessageList (list), graph(graph_)
     {
+
     }
     
     int getNumRows() override    { return midiMessageList.size(); }
@@ -1279,20 +1284,37 @@ public:
     {
         if (isPositiveAndBelow (row, midiMessageList.size()))
         {
+            typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+            Font font(typeface);
+            g.setFont(font);
+            
+            auto r = Rectangle<float> (width, height);
+            const float arrowH = font.getAscent() * 1.8f;
+            
+            auto iconArea = r.removeFromLeft((int)arrowH).reduced(4);
+            
+            Path p(MiddleLookAndFeel().getPathFromChar(0xE405));
+            
             const String& message = midiMessageList.getReference (row);
             
             if (rowIsSelected) {
-                //if (row == midiMessageList.indexOf(graph.getLastDocumentOpened().getFileNameWithoutExtension()))
-                g.fillAll (Colours::skyblue.withAlpha (0.3f));
+                
+                g.fillAll (findColour(mainAccentColourId));
+                g.setColour (Colours::white);
+                g.fillPath(p, p.getTransformToScaleToFit(iconArea, true));
+                g.drawText (message,
+                            r.reduced(4),
+                            Justification::centredLeft, true);
+            }
+            else {
+                g.setColour (findColour(mainAccentColourId));
+                g.fillPath(p, p.getTransformToScaleToFit(iconArea, true));
+                g.setColour (Colour(0xff575757));
+                g.drawText (message,
+                            r.reduced(4),
+                            Justification::centredLeft, true);
             }
 
-            g.setColour (Colours::black);
-            typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
-            g.setFont(typeface);
-            
-            g.drawText (message,
-                        Rectangle<int> (width, height).reduced (4, 0),
-                        Justification::centredLeft, true);
         }
     }
     
@@ -1331,13 +1353,13 @@ public:
         setOpaque (false);
         addAndMakeVisible(titleLabel);
         titleLabel.setText("Template Projects", dontSendNotification);
-        titleLabel.setColour(Label::textColourId, findColour(mainAccentColourId));
+        titleLabel.setColour(Label::textColourId, Colour(0xff575757));
         titleLabel.setJustificationType(Justification::centred);
         addAndMakeVisible (messageListBox);
         messageListBox.setModel (&midiLogListBoxModel);
         messageListBox.setMultipleSelectionEnabled(false);
-        messageListBox.setRowHeight(25);
-        messageListBox.setColour(ListBox::backgroundColourId, findColour(lightAccentColourId));
+        messageListBox.setRowHeight(40);
+        messageListBox.setColour(ListBox::backgroundColourId, Colours::whitesmoke);
         fillList();
         
     }
@@ -1652,7 +1674,11 @@ public:
         
         if (textH > 0)
         {
-            g.setFont ((float) textH);
+            ReferenceCountedObjectPtr<Typeface> typeface;
+            typeface = Typeface::createSystemTypefaceFor(BinaryData::quicksand_regular_ttf, BinaryData::quicksand_regular_ttf_Size);
+            Font font(typeface);
+            font.setHeight((float) textH);
+            g.setFont(font);
             
             g.setColour (findColour (getToggleState() ? DrawableButton::textColourOnId
                                      : DrawableButton::textColourId)

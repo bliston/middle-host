@@ -110,6 +110,10 @@
           file="Source/MainHostWindow.h"/>
     <FILE id="mIsfdm" name="SlidingPanelComponent.cpp" compile="1" resource="0"
           file="Source/SlidingPanelComponent.cpp"/>
+    <FILE id="L5mgvg" name="CustomAudioDeviceSelectorComponent.cpp" compile="1"
+          resource="0" file="Source/CustomAudioDeviceSelectorComponent.cpp"/>
+    <FILE id="qDRwkt" name="CustomAudioDeviceSelectorComponent.h" compile="0"
+          resource="0" file="Source/CustomAudioDeviceSelectorComponent.h"/>
     <FILE id="ppAE54" name="SlidingPanelComponent.h" compile="0" resource="0"
           file="Source/SlidingPanelComponent.h"/>
     <FILE id="AkkkFP" name="StartPageComponent.h" compile="0" resource="0"

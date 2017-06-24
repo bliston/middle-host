@@ -29,13 +29,14 @@ struct SlidingPanelComponent::DotButton  : public Button
 
     void paintButton (Graphics& g, bool /*isMouseOverButton*/, bool /*isButtonDown*/) override
     {
-        g.setColour (findColour (mainBackgroundColourId).contrasting());
+        g.setColour (Colour(0xff575757));
         const Rectangle<float> r (getLocalBounds().reduced (getWidth() / 4).toFloat());
         if (owner.getNumTabs() > 1) {
             if (index == owner.getCurrentTabIndex())
                 g.fillEllipse (r);
             else
-                g.drawEllipse (r, 1.0f);
+                g.setColour (Colours::lightgrey);
+                g.fillEllipse (r);
         }
 
     }
@@ -104,8 +105,8 @@ void SlidingPanelComponent::resized()
 
  
     Rectangle<int> dotHolder;
-        dotHolder = content.removeFromBottom (20 + dotSize)
-                                 .reduced ((content.getWidth() - dotSize * getNumTabs()) / 2, 10);
+        dotHolder = content.removeFromBottom (40 + dotSize)
+                                 .reduced ((content.getWidth() - dotSize * getNumTabs()) / 2, 20);
 
     for (int i = 0; i < getNumTabs(); ++i) {
         pages.getUnchecked(i)->dotButton->setBounds (dotHolder.removeFromLeft (dotSize));

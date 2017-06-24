@@ -31,6 +31,7 @@
 		D493393499E0822C70009A63 = {isa = PBXBuildFile; fileRef = 362BB539489999164C3A3D5B; };
 		6CD3B433544911DA879170AE = {isa = PBXBuildFile; fileRef = 1EC0F33A3BABE58138317375; };
 		189FA5E2F517FFFA54B78704 = {isa = PBXBuildFile; fileRef = BE86E181F9717F9512D92065; };
+		2284DDDB59782A65EA8EAC5F = {isa = PBXBuildFile; fileRef = 8E8DEDE22EC98CA2BE823D82; };
 		52960A0925FCE4822C62A868 = {isa = PBXBuildFile; fileRef = 4A9B76BF360CE628651B0FCB; };
 		93DB7A11F69BE06391046FA1 = {isa = PBXBuildFile; fileRef = 2D2541F927EB5EC4A254B745; };
 		EBFC008D1B7B2C2174EFA345 = {isa = PBXBuildFile; fileRef = 727427F3107F36FAB510AA17; };
@@ -745,6 +746,7 @@
 		8D8D3FA1F43A5C43285382C3 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_CatmullRomInterpolator.h"; path = "../../../JUCE/modules/juce_audio_basics/effects/juce_CatmullRomInterpolator.h"; sourceTree = "SOURCE_ROOT"; };
 		8E5439040A0F4A02F5C4DCB9 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_PathIterator.cpp"; path = "../../../JUCE/modules/juce_graphics/geometry/juce_PathIterator.cpp"; sourceTree = "SOURCE_ROOT"; };
 		8E7FD0BC03BA00A207EF7090 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_MACAddress.h"; path = "../../../JUCE/modules/juce_core/network/juce_MACAddress.h"; sourceTree = "SOURCE_ROOT"; };
+		8E8DEDE22EC98CA2BE823D82 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CustomAudioDeviceSelectorComponent.cpp; path = ../../Source/CustomAudioDeviceSelectorComponent.cpp; sourceTree = "SOURCE_ROOT"; };
 		8E8ECF093CB2DF30F74EEFDC = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_WebInputStream.cpp"; path = "../../../JUCE/modules/juce_core/network/juce_WebInputStream.cpp"; sourceTree = "SOURCE_ROOT"; };
 		8EC276C630908925A372295C = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_FileBrowserComponent.cpp"; path = "../../../JUCE/modules/juce_gui_basics/filebrowser/juce_FileBrowserComponent.cpp"; sourceTree = "SOURCE_ROOT"; };
 		8EE063559FF999AD2F23E5F6 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = "juce_graphics.mm"; path = "../../../JUCE/modules/juce_graphics/juce_graphics.mm"; sourceTree = "SOURCE_ROOT"; };
@@ -799,6 +801,7 @@
 		9B526CE5A6585AB7F2A20347 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = "juce_gui_extra.mm"; path = "../../../JUCE/modules/juce_gui_extra/juce_gui_extra.mm"; sourceTree = "SOURCE_ROOT"; };
 		9B5DDF63FE98AA5182CD4895 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_SubregionStream.h"; path = "../../../JUCE/modules/juce_core/streams/juce_SubregionStream.h"; sourceTree = "SOURCE_ROOT"; };
 		9B6E0AA60A8ABCB7E0C2BAED = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_AudioUnitPluginFormat.h"; path = "../../../JUCE/modules/juce_audio_processors/format_types/juce_AudioUnitPluginFormat.h"; sourceTree = "SOURCE_ROOT"; };
+		9B722014E484F988B8426425 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomAudioDeviceSelectorComponent.h; path = ../../Source/CustomAudioDeviceSelectorComponent.h; sourceTree = "SOURCE_ROOT"; };
 		9BA1DD697B98005D24F7EC3C = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FilterGraph.cpp; path = ../../Source/FilterGraph.cpp; sourceTree = "SOURCE_ROOT"; };
 		9BD854D578EF2CB87DD38533 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "codec_internal.h"; path = "../../../JUCE/modules/juce_audio_formats/codecs/oggvorbis/libvorbis-1.3.2/lib/codec_internal.h"; sourceTree = "SOURCE_ROOT"; };
 		9BDEF36D41EE5B034DCA7711 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_ResizableBorderComponent.h"; path = "../../../JUCE/modules/juce_gui_basics/layout/juce_ResizableBorderComponent.h"; sourceTree = "SOURCE_ROOT"; };
@@ -1280,6 +1283,8 @@
 					1EC0F33A3BABE58138317375,
 					6692043E22BB181F01767845,
 					BE86E181F9717F9512D92065,
+					8E8DEDE22EC98CA2BE823D82,
+					9B722014E484F988B8426425,
 					B599E2B118CC775AF115655A,
 					C24A701A7582124F06694887,
 					4A9B76BF360CE628651B0FCB, ); name = Middle; sourceTree = "<group>"; };
@@ -2837,6 +2842,7 @@
 					D493393499E0822C70009A63,
 					6CD3B433544911DA879170AE,
 					189FA5E2F517FFFA54B78704,
+					2284DDDB59782A65EA8EAC5F,
 					52960A0925FCE4822C62A868,
 					93DB7A11F69BE06391046FA1,
 					EBFC008D1B7B2C2174EFA345,

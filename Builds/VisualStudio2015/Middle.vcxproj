@@ -140,6 +140,7 @@
     <ClCompile Include="..\..\Source\InternalFilters.cpp"/>
     <ClCompile Include="..\..\Source\MainHostWindow.cpp"/>
     <ClCompile Include="..\..\Source\SlidingPanelComponent.cpp"/>
+    <ClCompile Include="..\..\Source\CustomAudioDeviceSelectorComponent.cpp"/>
     <ClCompile Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -1730,6 +1731,7 @@
     <ClInclude Include="..\..\Source\GraphEditorPanel.h"/>
     <ClInclude Include="..\..\Source\InternalFilters.h"/>
     <ClInclude Include="..\..\Source\MainHostWindow.h"/>
+    <ClInclude Include="..\..\Source\CustomAudioDeviceSelectorComponent.h"/>
     <ClInclude Include="..\..\Source\SlidingPanelComponent.h"/>
     <ClInclude Include="..\..\Source\StartPageComponent.h"/>
     <ClInclude Include="..\..\Source\MiddleLookAndFeel.h"/>

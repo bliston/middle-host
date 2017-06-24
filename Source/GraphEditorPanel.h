@@ -30,7 +30,7 @@
 #include "BinaryData.h"
 #include "AppColours.h"
 #include "CustomMidiKeyboardComponent.h"
-//#include "MiddleLookAndFeel.h"
+#include "MiddleLookAndFeel.h"
 
 class FilterComponent;
 class ConnectorComponent;

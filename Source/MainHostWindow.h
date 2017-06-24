@@ -27,7 +27,7 @@
 
 #include "FilterGraph.h"
 #include "GraphEditorPanel.h"
-
+#include "CustomAudioDeviceSelectorComponent.h"
 
 //==============================================================================
 namespace CommandIDs

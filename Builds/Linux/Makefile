@@ -73,6 +73,7 @@ OBJECTS := \
   $(JUCE_OBJDIR)/InternalFilters_beb54bdf.o \
   $(JUCE_OBJDIR)/MainHostWindow_e920295a.o \
   $(JUCE_OBJDIR)/SlidingPanelComponent_c5695508.o \
+  $(JUCE_OBJDIR)/CustomAudioDeviceSelectorComponent_d997338c.o \
   $(JUCE_OBJDIR)/juce_audio_basics_6b797ca1.o \
   $(JUCE_OBJDIR)/juce_audio_devices_a742c38b.o \
   $(JUCE_OBJDIR)/juce_audio_formats_5a29c68a.o \
@@ -152,6 +153,11 @@ $(JUCE_OBJDIR)/MainHostWindow_e920295a.o: ../../Source/MainHostWindow.cpp
 $(JUCE_OBJDIR)/SlidingPanelComponent_c5695508.o: ../../Source/SlidingPanelComponent.cpp
 	-@mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling SlidingPanelComponent.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/CustomAudioDeviceSelectorComponent_d997338c.o: ../../Source/CustomAudioDeviceSelectorComponent.cpp
+	-@mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling CustomAudioDeviceSelectorComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/juce_audio_basics_6b797ca1.o: ../../JuceLibraryCode/juce_audio_basics.cpp
