@@ -25,7 +25,6 @@
 #ifndef JUCE_CUSTOMAUDIODEVICESELECTORCOMPONENT_H_INCLUDED
 #define JUCE_CUSTOMAUDIODEVICESELECTORCOMPONENT_H_INCLUDED
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "MiddleLookAndFeel.h"
 
 //==============================================================================
 /**

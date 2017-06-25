@@ -57,7 +57,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\..\..\..\JUCE\modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\..\..\..\JUCE\modules;..\..\modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;DEBUG;_DEBUG;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=0.0.2;JUCE_APP_VERSION_HEX=0x2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -98,7 +98,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\..\..\..\JUCE\modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\..\..\..\JUCE\modules;..\..\modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;NDEBUG;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=0.0.2;JUCE_APP_VERSION_HEX=0x2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -131,7 +131,6 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\BinaryData.cpp"/>
     <ClCompile Include="..\..\Source\CustomMidiKeyboardComponent.cpp"/>
     <ClCompile Include="..\..\Source\FilterGraph.cpp"/>
     <ClCompile Include="..\..\Source\FilterIOConfiguration.cpp"/>
@@ -139,7 +138,6 @@
     <ClCompile Include="..\..\Source\HostStartup.cpp"/>
     <ClCompile Include="..\..\Source\InternalFilters.cpp"/>
     <ClCompile Include="..\..\Source\MainHostWindow.cpp"/>
-    <ClCompile Include="..\..\Source\SlidingPanelComponent.cpp"/>
     <ClCompile Include="..\..\Source\CustomAudioDeviceSelectorComponent.cpp"/>
     <ClCompile Include="..\..\..\..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -1707,6 +1705,15 @@
     <ClCompile Include="..\..\..\..\..\..\JUCE\modules\juce_video\juce_video.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels\BinaryData\BinaryData.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels\Components\SlidingPanelComponent.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\JuceLibraryCode\juce_audio_basics.cpp"/>
     <ClCompile Include="..\..\JuceLibraryCode\juce_audio_devices.cpp"/>
     <ClCompile Include="..\..\JuceLibraryCode\juce_audio_formats.cpp"/>
@@ -1721,10 +1728,9 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_gui_extra.cpp"/>
     <ClCompile Include="..\..\JuceLibraryCode\juce_opengl.cpp"/>
     <ClCompile Include="..\..\JuceLibraryCode\juce_video.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\Peels.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\AppColours.h"/>
-    <ClInclude Include="..\..\Source\BinaryData.h"/>
     <ClInclude Include="..\..\Source\CustomMidiKeyboardComponent.h"/>
     <ClInclude Include="..\..\Source\FilterGraph.h"/>
     <ClInclude Include="..\..\Source\FilterIOConfiguration.h"/>
@@ -1732,9 +1738,7 @@
     <ClInclude Include="..\..\Source\InternalFilters.h"/>
     <ClInclude Include="..\..\Source\MainHostWindow.h"/>
     <ClInclude Include="..\..\Source\CustomAudioDeviceSelectorComponent.h"/>
-    <ClInclude Include="..\..\Source\SlidingPanelComponent.h"/>
     <ClInclude Include="..\..\Source\StartPageComponent.h"/>
-    <ClInclude Include="..\..\Source\MiddleLookAndFeel.h"/>
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h"/>
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioDataConverters.h"/>
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioSampleBuffer.h"/>
@@ -2345,6 +2349,13 @@
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_video\playback\juce_QuickTimeMovieComponent.h"/>
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_video\juce_video.h"/>
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_video\juce_video.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels\BinaryData\BinaryData.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels\ColorIds\AppColours.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels\Components\SlidingPanelComponent.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels\LookAndFeels\MiddleLookAndFeel.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels\PeelsCommon.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\AppConfig.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
@@ -2353,6 +2364,7 @@
     <None Include="..\..\..\..\..\..\JUCE\modules\juce_audio_formats\codecs\oggvorbis\Ogg Vorbis Licence.txt"/>
     <None Include="..\..\..\..\..\..\JUCE\modules\juce_graphics\image_formats\jpglib\changes to libjpeg for JUCE.txt"/>
     <None Include="..\..\..\..\..\..\JUCE\modules\juce_graphics\image_formats\pnglib\libpng_readme.txt"/>
+    <None Include="..\..\modules\Peels\README.md"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\resources.rc"/>

@@ -33,7 +33,7 @@ ifeq ($(CONFIG),Debug)
     TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_7346DA2A=1 -DJUCE_APP_VERSION=0.0.2 -DJUCE_APP_VERSION_HEX=0x2 $(shell pkg-config --cflags alsa freetype2 libcurl x11 xext xinerama) -pthread -I../../JuceLibraryCode -I../../../../../../JUCE/modules $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DJUCER_LINUX_MAKE_7346DA2A=1 -DJUCE_APP_VERSION=0.0.2 -DJUCE_APP_VERSION_HEX=0x2 $(shell pkg-config --cflags alsa freetype2 libcurl x11 xext xinerama) -pthread -I../../JuceLibraryCode -I../../../../../../JUCE/modules -I../../modules $(CPPFLAGS)
   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0 $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++11 $(CXXFLAGS)
   JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -L/usr/X11R6/lib/ $(shell pkg-config --libs alsa freetype2 libcurl x11 xext xinerama) -lGL -ldl -lpthread -lrt  $(LDFLAGS)
@@ -53,7 +53,7 @@ ifeq ($(CONFIG),Release)
     TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_7346DA2A=1 -DJUCE_APP_VERSION=0.0.2 -DJUCE_APP_VERSION_HEX=0x2 $(shell pkg-config --cflags alsa freetype2 libcurl x11 xext xinerama) -pthread -I../../JuceLibraryCode -I../../../../../../JUCE/modules $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DJUCER_LINUX_MAKE_7346DA2A=1 -DJUCE_APP_VERSION=0.0.2 -DJUCE_APP_VERSION_HEX=0x2 $(shell pkg-config --cflags alsa freetype2 libcurl x11 xext xinerama) -pthread -I../../JuceLibraryCode -I../../../../../../JUCE/modules -I../../modules $(CPPFLAGS)
   JUCE_CFLAGS += $(JUCE_CPPFLAGS) $(TARGET_ARCH) -Os $(CFLAGS)
   JUCE_CXXFLAGS += $(JUCE_CFLAGS) -std=c++11 $(CXXFLAGS)
   JUCE_LDFLAGS += $(TARGET_ARCH) -L$(JUCE_BINDIR) -L$(JUCE_LIBDIR) -fvisibility=hidden -L/usr/X11R6/lib/ $(shell pkg-config --libs alsa freetype2 libcurl x11 xext xinerama) -lGL -ldl -lpthread -lrt  $(LDFLAGS)
@@ -64,7 +64,6 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
-  $(JUCE_OBJDIR)/BinaryData_5ba7f54.o \
   $(JUCE_OBJDIR)/CustomMidiKeyboardComponent_e178a525.o \
   $(JUCE_OBJDIR)/FilterGraph_62e9c017.o \
   $(JUCE_OBJDIR)/FilterIOConfiguration_1cc9b659.o \
@@ -72,7 +71,6 @@ OBJECTS := \
   $(JUCE_OBJDIR)/HostStartup_5ce96f96.o \
   $(JUCE_OBJDIR)/InternalFilters_beb54bdf.o \
   $(JUCE_OBJDIR)/MainHostWindow_e920295a.o \
-  $(JUCE_OBJDIR)/SlidingPanelComponent_c5695508.o \
   $(JUCE_OBJDIR)/CustomAudioDeviceSelectorComponent_d997338c.o \
   $(JUCE_OBJDIR)/juce_audio_basics_6b797ca1.o \
   $(JUCE_OBJDIR)/juce_audio_devices_a742c38b.o \
@@ -88,6 +86,7 @@ OBJECTS := \
   $(JUCE_OBJDIR)/juce_gui_extra_4a026f23.o \
   $(JUCE_OBJDIR)/juce_opengl_cd70b4c2.o \
   $(JUCE_OBJDIR)/juce_video_f128c512.o \
+  $(JUCE_OBJDIR)/Peels_14e67ef8.o \
 
 .PHONY: clean
 
@@ -109,11 +108,6 @@ clean:
 strip:
 	@echo Stripping Middle
 	-@$(STRIP) --strip-unneeded $(JUCE_OUTDIR)/$(TARGET)
-
-$(JUCE_OBJDIR)/BinaryData_5ba7f54.o: ../../Source/BinaryData.cpp
-	-@mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling BinaryData.cpp"
-	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/CustomMidiKeyboardComponent_e178a525.o: ../../Source/CustomMidiKeyboardComponent.cpp
 	-@mkdir -p $(JUCE_OBJDIR)
@@ -148,11 +142,6 @@ $(JUCE_OBJDIR)/InternalFilters_beb54bdf.o: ../../Source/InternalFilters.cpp
 $(JUCE_OBJDIR)/MainHostWindow_e920295a.o: ../../Source/MainHostWindow.cpp
 	-@mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling MainHostWindow.cpp"
-	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
-
-$(JUCE_OBJDIR)/SlidingPanelComponent_c5695508.o: ../../Source/SlidingPanelComponent.cpp
-	-@mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling SlidingPanelComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/CustomAudioDeviceSelectorComponent_d997338c.o: ../../Source/CustomAudioDeviceSelectorComponent.cpp
@@ -228,6 +217,11 @@ $(JUCE_OBJDIR)/juce_opengl_cd70b4c2.o: ../../JuceLibraryCode/juce_opengl.cpp
 $(JUCE_OBJDIR)/juce_video_f128c512.o: ../../JuceLibraryCode/juce_video.cpp
 	-@mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling juce_video.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/Peels_14e67ef8.o: ../../JuceLibraryCode/Peels.cpp
+	-@mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling Peels.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)

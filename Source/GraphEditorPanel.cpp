@@ -1292,8 +1292,7 @@ public:
             const float arrowH = font.getAscent() * 1.8f;
             
             auto iconArea = r.removeFromLeft((int)arrowH).reduced(4);
-            
-            Path p(MiddleLookAndFeel().getPathFromChar(0xE405));
+            Path p(Peels::MiddleLookAndFeel().getPathFromChar(0xE405));
             
             const String& message = midiMessageList.getReference (row);
             
@@ -1855,7 +1854,7 @@ GraphDocumentComponent::GraphDocumentComponent (AudioPluginFormatManager& format
       graphPlayer (getAppProperties().getUserSettings()->getBoolValue ("doublePrecisionProcessing", false))
 {
     graphPanel = new GraphEditorPanel (*graph);
-    addAndMakeVisible(panel = new SlidingPanelComponent());
+    addAndMakeVisible(panel = new Peels::SlidingPanelComponent());
     TemplateTileBrowser* menu;
     panel->addTab ("Menu", menu = new TemplateTileBrowser (*graph), true);
     panel->addTab ("Graph", graphPanel, true);

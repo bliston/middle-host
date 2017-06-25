@@ -26,11 +26,7 @@
 #define __GRAPHEDITORPANEL_JUCEHEADER__
 
 #include "FilterGraph.h"
-#include "SlidingPanelComponent.h"
-#include "BinaryData.h"
-#include "AppColours.h"
 #include "CustomMidiKeyboardComponent.h"
-#include "MiddleLookAndFeel.h"
 
 class FilterComponent;
 class ConnectorComponent;
@@ -159,14 +155,13 @@ private:
 
 public:
     GraphEditorPanel* graphPanel;
-    SlidingPanelComponent* panel;
+    Peels::SlidingPanelComponent* panel;
     
 
 private:
     Component* keyboardComp;
     Component* statusBar;
     KeyboardFocusTransferer* keyboardFocusTransferer;
-    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphDocumentComponent)
 };

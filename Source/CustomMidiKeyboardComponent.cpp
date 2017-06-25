@@ -638,7 +638,7 @@ void CustomMidiKeyboardComponent::drawUpDownButton(Graphics& g, int w, int h,
 //	path.lineTo(0.0f, 1.0f);
 //	path.lineTo(1.0f, 0.5f);
     
-    Path path(MiddleLookAndFeel().getPathFromChar(0xE314));
+    Path path(Peels::MiddleLookAndFeel().getPathFromChar(0xE314));
 
 	path.applyTransform(AffineTransform::rotation(float_Pi * 2.0f * angle, 0.5f, 0.5f));
 

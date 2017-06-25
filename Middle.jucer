@@ -30,6 +30,7 @@
         <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="Peels" path="modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/Linux" vstFolder="" vst3Folder="">
@@ -54,6 +55,7 @@
         <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="Peels" path="modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2015 targetFolder="Builds/VisualStudio2015" vstFolder="" vst3Folder="../../../../VST3 SDK">
@@ -78,13 +80,11 @@
         <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="Peels" path="modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>
   <MAINGROUP id="YdWL7hi7p" name="Middle">
-    <FILE id="MwOpL6" name="AppColours.h" compile="0" resource="0" file="Source/AppColours.h"/>
-    <FILE id="vpNdtl" name="BinaryData.cpp" compile="1" resource="0" file="Source/BinaryData.cpp"/>
-    <FILE id="fqIzEM" name="BinaryData.h" compile="0" resource="0" file="Source/BinaryData.h"/>
     <FILE id="UAWMnb" name="CustomMidiKeyboardComponent.cpp" compile="1"
           resource="0" file="Source/CustomMidiKeyboardComponent.cpp"/>
     <FILE id="DGepwY" name="CustomMidiKeyboardComponent.h" compile="0"
@@ -108,18 +108,12 @@
           file="Source/MainHostWindow.cpp"/>
     <FILE id="pviN3M" name="MainHostWindow.h" compile="0" resource="0"
           file="Source/MainHostWindow.h"/>
-    <FILE id="mIsfdm" name="SlidingPanelComponent.cpp" compile="1" resource="0"
-          file="Source/SlidingPanelComponent.cpp"/>
     <FILE id="L5mgvg" name="CustomAudioDeviceSelectorComponent.cpp" compile="1"
           resource="0" file="Source/CustomAudioDeviceSelectorComponent.cpp"/>
     <FILE id="qDRwkt" name="CustomAudioDeviceSelectorComponent.h" compile="0"
           resource="0" file="Source/CustomAudioDeviceSelectorComponent.h"/>
-    <FILE id="ppAE54" name="SlidingPanelComponent.h" compile="0" resource="0"
-          file="Source/SlidingPanelComponent.h"/>
     <FILE id="AkkkFP" name="StartPageComponent.h" compile="0" resource="0"
           file="Source/StartPageComponent.h"/>
-    <FILE id="ZFtCEw" name="MiddleLookAndFeel.h" compile="1" resource="0"
-          file="Source/MiddleLookAndFeel.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_WASAPI="enabled" JUCE_DIRECTSOUND="enabled" JUCE_ALSA="enabled"
                JUCE_QUICKTIME="disabled" JUCE_USE_FLAC="disabled" JUCE_USE_OGGVORBIS="enabled"
@@ -142,6 +136,7 @@
     <MODULE id="juce_gui_extra" showAllCode="1"/>
     <MODULE id="juce_opengl" showAllCode="1"/>
     <MODULE id="juce_video" showAllCode="1"/>
+    <MODULE id="Peels" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <LIVE_SETTINGS>
     <OSX/>

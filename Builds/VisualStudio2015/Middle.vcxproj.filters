@@ -359,14 +359,29 @@
     <Filter Include="Juce Modules\juce_video\playback">
       <UniqueIdentifier>{0E43EA8A-95EE-4253-E1B7-160F38ACBB00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Juce Modules\Peels">
+      <UniqueIdentifier>{A26B1DEA-DFB8-BED4-C1EB-FF597920A321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Juce Modules\Peels\Peels">
+      <UniqueIdentifier>{2D24FA22-674F-EBC6-97A5-4529319B3595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Juce Modules\Peels\Peels\BinaryData">
+      <UniqueIdentifier>{01EFED1E-7EE1-44FB-5225-0511F4807F42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Juce Modules\Peels\Peels\ColorIds">
+      <UniqueIdentifier>{56721022-300D-07A6-5EA4-AC59B6176E7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Juce Modules\Peels\Peels\Components">
+      <UniqueIdentifier>{136753D7-E50D-A9CE-AA51-07770ED62795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Juce Modules\Peels\Peels\LookAndFeels">
+      <UniqueIdentifier>{A793C9CD-FEC8-0435-1C5D-14E648175539}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Juce Library Code">
       <UniqueIdentifier>{8B4D1BAA-6DB4-CAEC-A0FA-271F354D5C61}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\BinaryData.cpp">
-      <Filter>Middle</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\CustomMidiKeyboardComponent.cpp">
       <Filter>Middle</Filter>
     </ClCompile>
@@ -386,9 +401,6 @@
       <Filter>Middle</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\MainHostWindow.cpp">
-      <Filter>Middle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SlidingPanelComponent.cpp">
       <Filter>Middle</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\CustomAudioDeviceSelectorComponent.cpp">
@@ -2083,6 +2095,18 @@
     <ClCompile Include="..\..\..\..\..\..\JUCE\modules\juce_video\juce_video.mm">
       <Filter>Juce Modules\juce_video</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels\BinaryData\BinaryData.cpp">
+      <Filter>Juce Modules\Peels\Peels\BinaryData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels\Components\SlidingPanelComponent.cpp">
+      <Filter>Juce Modules\Peels\Peels\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels.cpp">
+      <Filter>Juce Modules\Peels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\modules\Peels\Peels.mm">
+      <Filter>Juce Modules\Peels</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\JuceLibraryCode\juce_audio_basics.cpp">
       <Filter>Juce Library Code</Filter>
     </ClCompile>
@@ -2125,14 +2149,11 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_video.cpp">
       <Filter>Juce Library Code</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\JuceLibraryCode\Peels.cpp">
+      <Filter>Juce Library Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\AppColours.h">
-      <Filter>Middle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\BinaryData.h">
-      <Filter>Middle</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\CustomMidiKeyboardComponent.h">
       <Filter>Middle</Filter>
     </ClInclude>
@@ -2154,13 +2175,7 @@
     <ClInclude Include="..\..\Source\CustomAudioDeviceSelectorComponent.h">
       <Filter>Middle</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\SlidingPanelComponent.h">
-      <Filter>Middle</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\StartPageComponent.h">
-      <Filter>Middle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MiddleLookAndFeel.h">
       <Filter>Middle</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h">
@@ -3993,6 +4008,27 @@
     <ClInclude Include="..\..\..\..\..\..\JUCE\modules\juce_video\juce_video.h">
       <Filter>Juce Modules\juce_video</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels\BinaryData\BinaryData.h">
+      <Filter>Juce Modules\Peels\Peels\BinaryData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels\ColorIds\AppColours.h">
+      <Filter>Juce Modules\Peels\Peels\ColorIds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels\Components\SlidingPanelComponent.h">
+      <Filter>Juce Modules\Peels\Peels\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels\LookAndFeels\MiddleLookAndFeel.h">
+      <Filter>Juce Modules\Peels\Peels\LookAndFeels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels\PeelsCommon.h">
+      <Filter>Juce Modules\Peels\Peels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels.h">
+      <Filter>Juce Modules\Peels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels.h">
+      <Filter>Juce Modules\Peels</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\JuceLibraryCode\AppConfig.h">
       <Filter>Juce Library Code</Filter>
     </ClInclude>
@@ -4012,6 +4048,9 @@
     </None>
     <None Include="..\..\..\..\..\..\JUCE\modules\juce_graphics\image_formats\pnglib\libpng_readme.txt">
       <Filter>Juce Modules\juce_graphics\image_formats\pnglib</Filter>
+    </None>
+    <None Include="..\..\modules\Peels\README.md">
+      <Filter>Juce Modules\Peels</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

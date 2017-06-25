@@ -1,0 +1,36 @@
+{
+  "id": "Peels",
+  "name": "Peels",
+  "version": "0.0.1",
+  "description": "Add description",
+  "website": "Add URL",
+  "license": "Not Specified",
+  "dependencies": [
+    {
+      "id": "juce_core",
+      "version": "matching"
+    },
+    {
+      "id": "juce_data_structures",
+      "version": "matching"
+    },
+    {
+      "id": "juce_gui_basics",
+      "version": "matching"
+    }
+  ],
+  "include": "Peels.h",
+  "compile": [
+    {
+      "file": "Peels.cpp",
+      "target": "! xcode"
+    },
+    {
+      "file": "Peels.mm",
+      "target": "xcode"
+    }
+  ],
+  "browse": [
+    "Peels/*"
+  ]
+}

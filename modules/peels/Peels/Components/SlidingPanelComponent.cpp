@@ -16,13 +16,9 @@
   ==============================================================================
 */
 
-//#include "../jucer_Headers.h"
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "SlidingPanelComponent.h"
-#include "AppColours.h"
 
-
-struct SlidingPanelComponent::DotButton  : public Button
+struct Peels::SlidingPanelComponent::DotButton  : public Button
 {
     DotButton (SlidingPanelComponent& sp, int pageIndex)
         : Button (String()), owner (sp), index (pageIndex) {}
@@ -51,23 +47,23 @@ struct SlidingPanelComponent::DotButton  : public Button
 };
 
 //==============================================================================
-SlidingPanelComponent::SlidingPanelComponent()
+Peels::SlidingPanelComponent::SlidingPanelComponent()
     : currentIndex (0), dotSize (30)
 {
     addAndMakeVisible (pageHolder);
 }
 
-SlidingPanelComponent::~SlidingPanelComponent()
+Peels::SlidingPanelComponent::~SlidingPanelComponent()
 {
 }
 
-SlidingPanelComponent::PageInfo::~PageInfo()
+Peels::SlidingPanelComponent::PageInfo::~PageInfo()
 {
     if (shouldDelete)
         content.deleteAndZero();
 }
 
-void SlidingPanelComponent::addTab (const String& tabName,
+void Peels::SlidingPanelComponent::addTab (const String& tabName,
                                     Component* const contentComponent,
                                     const bool deleteComponentWhenNotNeeded,
                                     const int insertIndex)
@@ -85,7 +81,7 @@ void SlidingPanelComponent::addTab (const String& tabName,
     resized();
 }
 
-void SlidingPanelComponent::goToTab (int targetTabIndex)
+void Peels::SlidingPanelComponent::goToTab (int targetTabIndex)
 {
     currentIndex = targetTabIndex;
 
@@ -96,7 +92,7 @@ void SlidingPanelComponent::goToTab (int targetTabIndex)
     repaint();
 }
 
-void SlidingPanelComponent::resized()
+void Peels::SlidingPanelComponent::resized()
 {
     pageHolder.setBounds (-currentIndex * getWidth(), pageHolder.getPosition().y,
                           getNumTabs() * getWidth(), getHeight());

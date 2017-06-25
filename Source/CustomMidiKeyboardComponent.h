@@ -25,7 +25,7 @@ available: visit www.juce.com for more information.
 #ifndef CUSTOMMIDIKEYBOARDCOMPONENT_H_INCLUDED
 #define CUSTOMMIDIKEYBOARDCOMPONENT_H_INCLUDED
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "MiddleLookAndFeel.h"
+
 //==============================================================================
 /**
 A component that displays a piano keyboard, whose notes can be clicked on.

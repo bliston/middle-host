@@ -25,7 +25,6 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainHostWindow.h"
 #include "InternalFilters.h"
-#include "MiddleLookAndFeel.h"
 
 #if ! (JUCE_PLUGINHOST_VST || JUCE_PLUGINHOST_VST3 || JUCE_PLUGINHOST_AU)
  #error "If you're building the audio plugin host, you probably want to enable VST and/or AU support"
@@ -52,7 +51,7 @@ public:
         appProperties = new ApplicationProperties();
         appProperties->setStorageParameters (options);
         
-        LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
+		LookAndFeel::setDefaultLookAndFeel(&lookAndFeel);
 
         mainWindow = new MainHostWindow();
         mainWindow->setUsingNativeTitleBar (true);
@@ -123,10 +122,10 @@ public:
 
     ApplicationCommandManager commandManager;
     ScopedPointer<ApplicationProperties> appProperties;
-    MiddleLookAndFeel lookAndFeel;
 
 private:
     ScopedPointer<MainHostWindow> mainWindow;
+	Peels::MiddleLookAndFeel lookAndFeel;
 };
 
 static PluginHostApp& getApp()                      { return *dynamic_cast<PluginHostApp*>(JUCEApplication::getInstance()); }
