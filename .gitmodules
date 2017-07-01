@@ -1,1 +1,4 @@
 
+[submodule "modules/peels"]
+	path = modules/peels
+	url = https://bliston@github.com/bliston/peels.git
