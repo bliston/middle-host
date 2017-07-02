@@ -374,6 +374,9 @@
     <Filter Include="Juce Modules\Peels\Peels\Components">
       <UniqueIdentifier>{136753D7-E50D-A9CE-AA51-07770ED62795}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Juce Modules\Peels\Peels\Icons">
+      <UniqueIdentifier>{048C931D-B9EE-6FDF-6935-F05E8F2C5083}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Juce Modules\Peels\Peels\LookAndFeels">
       <UniqueIdentifier>{A793C9CD-FEC8-0435-1C5D-14E648175539}</UniqueIdentifier>
     </Filter>
@@ -4016,6 +4019,9 @@
     </ClInclude>
     <ClInclude Include="..\..\modules\Peels\Peels\Components\SlidingPanelComponent.h">
       <Filter>Juce Modules\Peels\Peels\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\modules\Peels\Peels\Icons\Icons.h">
+      <Filter>Juce Modules\Peels\Peels\Icons</Filter>
     </ClInclude>
     <ClInclude Include="..\..\modules\Peels\Peels\LookAndFeels\MiddleLookAndFeel.h">
       <Filter>Juce Modules\Peels\Peels\LookAndFeels</Filter>

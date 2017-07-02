@@ -2352,6 +2352,7 @@
     <ClInclude Include="..\..\modules\Peels\Peels\BinaryData\BinaryData.h"/>
     <ClInclude Include="..\..\modules\Peels\Peels\ColorIds\AppColours.h"/>
     <ClInclude Include="..\..\modules\Peels\Peels\Components\SlidingPanelComponent.h"/>
+    <ClInclude Include="..\..\modules\Peels\Peels\Icons\Icons.h"/>
     <ClInclude Include="..\..\modules\Peels\Peels\LookAndFeels\MiddleLookAndFeel.h"/>
     <ClInclude Include="..\..\modules\Peels\Peels\PeelsCommon.h"/>
     <ClInclude Include="..\..\modules\Peels\Peels.h"/>

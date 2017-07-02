@@ -1,8 +1,6 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Middle", "Middle.vcxproj", "{0628E63C-9BCD-C866-7DA3-ACF9F6AD986E}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2015
+Project("{4E6DDA01-AD92-32D4-9173-3244B2EF1A1C}") = "Middle", "Middle.vcxproj", "{0628E63C-9BCD-C866-7DA3-ACF9F6AD986E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
